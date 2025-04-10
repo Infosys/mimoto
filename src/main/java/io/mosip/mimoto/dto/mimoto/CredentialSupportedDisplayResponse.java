@@ -32,7 +32,6 @@ public class CredentialSupportedDisplayResponse {
     @SerializedName("background_image")
     @Expose
     @Valid
-    @NotNull
     BackgroundImageDTO backgroundImage;
 
     @JsonProperty("background_color")
