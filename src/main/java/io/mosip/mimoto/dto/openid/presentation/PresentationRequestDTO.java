@@ -32,4 +32,28 @@ public class PresentationRequestDTO {
     @JsonProperty("dcql_query")
     String dcqlQuery;
 
+    public PresentationDefinitionDTO getPresentationDefinition() {
+        return presentationDefinition;
+    }
+
+    public String getResponseMode() {
+        return responseMode;
+    }
+
+    public String getResponseUri() {
+        return responseUri;
+    }
+
+    public String getRedirectUri() {
+        return redirectUri;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public String getNonce() {
+        return nonce;
+    }
+
 }

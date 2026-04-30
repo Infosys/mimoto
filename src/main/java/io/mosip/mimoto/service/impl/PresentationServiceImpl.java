@@ -15,6 +15,7 @@ import io.mosip.mimoto.service.PresentationService;
 import io.mosip.mimoto.util.RestApiClient;
 import io.mosip.openID4VP.constants.SpecVersion;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ import static io.mosip.mimoto.util.JwtUtils.parseJwtHeader;
 @Slf4j
 @Service
 public class PresentationServiceImpl implements PresentationService {
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(PresentationServiceImpl.class);
 
     private final DataShareServiceImpl dataShareService;
 
