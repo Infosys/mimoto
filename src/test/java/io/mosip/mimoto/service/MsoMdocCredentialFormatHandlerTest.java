@@ -382,6 +382,9 @@ class MsoMdocCredentialFormatHandlerTest {
         nsInnerClaims.put("givenName", new HashMap<>());
         credentialsSupportedResponse.setClaims(Map.of("org.iso.18013.5.1", nsInnerClaims));
 
+        CredentialDisplayResponseDto dto = createCredentialDisplayResponseDto("Given Name", "en");
+        when(objectMapper.convertValue(any(), eq(CredentialDisplayResponseDto.class))).thenReturn(dto);
+
         try (MockedStatic<LocaleUtils> mockedLocaleUtils = mockStatic(LocaleUtils.class)) {
             mockedLocaleUtils.when(() -> LocaleUtils.resolveLocaleWithFallback(any(), eq("en"))).thenReturn("en");
             mockedLocaleUtils.when(() -> LocaleUtils.matchesLocale(eq("en"), eq("en"))).thenReturn(true);
