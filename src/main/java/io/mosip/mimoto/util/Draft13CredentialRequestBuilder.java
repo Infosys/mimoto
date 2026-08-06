@@ -17,6 +17,8 @@ public class Draft13CredentialRequestBuilder {
             return buildLdpVcCredentialRequest(proof, credentialsSupportedResponse);
         else if (CredentialFormat.VC_SD_JWT.getFormat().equals(format) || CredentialFormat.DC_SD_JWT.getFormat().equals(format))
             return buildSdJwtCredentialRequest(format, proof, credentialsSupportedResponse);
+        else if (CredentialFormat.MSO_MDOC.getFormat().equals(format))
+            return buildMsoMdocCredentialRequest(proof, credentialsSupportedResponse);
         else
             throw new IllegalArgumentException("Unsupported credential format: " + format);
     }
@@ -40,6 +42,15 @@ public class Draft13CredentialRequestBuilder {
                 .builder()
                 .format(format)
                 .vct(credentialsSupportedResponse.getVct()).proof(proof)
+                .build();
+    }
+
+    private Draft13VCCredentialRequest buildMsoMdocCredentialRequest(VCCredentialRequestProof proof, CredentialsSupportedResponse credentialsSupportedResponse) {
+        return Draft13VCCredentialRequest
+                .builder()
+                .format(CredentialFormat.MSO_MDOC.getFormat())
+                .doctype(credentialsSupportedResponse.getDoctype())
+                .proof(proof)
                 .build();
     }
 }

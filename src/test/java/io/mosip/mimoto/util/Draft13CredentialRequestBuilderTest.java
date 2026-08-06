@@ -118,6 +118,21 @@ class Draft13CredentialRequestBuilderTest {
     }
 
     @Test
+    void buildCredentialRequestWithMsoMdocFormatShouldReturnCorrectRequest() {
+        credentialsSupportedResponse.setDoctype("org.iso.18013.5.1.mDL");
+
+        Draft13VCCredentialRequest result = builder.buildCredentialRequest(
+                CredentialFormat.MSO_MDOC.getFormat(), proof, credentialsSupportedResponse);
+
+        assertNotNull(result);
+        assertEquals(CredentialFormat.MSO_MDOC.getFormat(), result.getFormat());
+        assertEquals(proof, result.getProof());
+        assertEquals("org.iso.18013.5.1.mDL", result.getDoctype());
+        assertNull(result.getCredentialDefinition());
+        assertNull(result.getVct());
+    }
+
+    @Test
     void buildCredentialRequest_UnsupportedFormat_ThrowsIllegalArgumentException() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             builder.buildCredentialRequest("UNSUPPORTED_FORMAT", proof, credentialsSupportedResponse);
