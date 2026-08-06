@@ -117,18 +117,25 @@ public class MsoMdocCredentialFormatHandler implements CredentialFormatHandler {
             return buildFallbackDisplayProperties(credentialProperties, orderedKeys);
         }
 
-        // mso_mdoc claims are nested by namespace: { "org.iso.18013.5.1": { "given_name": {display:[...]}, ... } }
-        // Unwrap the single-namespace nesting so keys align with the flattened claim identifiers.
-        Map<String, Object> rawClaims = Optional.of(credentialsSupportedResponse.getClaims())
-                .map(map -> (map.size() == 1 && map.values().iterator().next() instanceof Map)
-                        ? (Map<String, Object>) map.values().iterator().next()
-                        : map)
-                .orElse(Collections.emptyMap());
+        // mso_mdoc claims are namespace-nested: { "<namespace>": { "<claim>": {display:[...]}, ... }, ... }
+        // Flatten all namespaces into one claim map so keys align with the flattened claim identifiers
+        // produced by extractCredentialClaims. Mirrors that method's multi-namespace handling.
+        Map<String, Object> rawClaims = credentialsSupportedResponse.getClaims().entrySet().stream()
+                .filter(e -> e.getValue() instanceof Map)
+                .flatMap(e -> ((Map<String, Object>) e.getValue()).entrySet().stream())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                ));
 
         Map<String, CredentialDisplayResponseDto> convertedClaimsMap = rawClaims.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        entry -> objectMapper.convertValue(entry.getValue(), CredentialDisplayResponseDto.class)
+                        entry -> objectMapper.convertValue(entry.getValue(), CredentialDisplayResponseDto.class),
+                        (a, b) -> a,
+                        LinkedHashMap::new
                 ));
 
         if (convertedClaimsMap.isEmpty()) {

@@ -118,6 +118,15 @@ class Draft13CredentialRequestBuilderTest {
     }
 
     @Test
+    void buildCredentialRequestWithMsoMdocFormatAndMissingDoctypeShouldThrowIllegalArgumentException() {
+        // doctype not set — simulates issuer well-known missing the doctype field
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                builder.buildCredentialRequest(CredentialFormat.MSO_MDOC.getFormat(), proof, credentialsSupportedResponse));
+
+        assertEquals("doctype is required for mso_mdoc credential format but is not configured in the issuer well-known", exception.getMessage());
+    }
+
+    @Test
     void buildCredentialRequestWithMsoMdocFormatShouldReturnCorrectRequest() {
         credentialsSupportedResponse.setDoctype("org.iso.18013.5.1.mDL");
 

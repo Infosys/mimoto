@@ -272,6 +272,44 @@ class MsoMdocCredentialFormatHandlerTest {
     }
 
     @Test
+    void loadDisplayPropertiesFromWellknownWithMultipleNamespacesShouldFlattenAllClaimsForDisplay() {
+        Map<String, Object> credentialProperties = new LinkedHashMap<>();
+        credentialProperties.put("given_name", "John");
+        credentialProperties.put("age_over_18", true);
+
+        // Two namespaces — the bug caused the second namespace's claims to be ignored
+        Map<String, Object> isoNsClaims = new HashMap<>();
+        isoNsClaims.put("given_name", new HashMap<>());
+        Map<String, Object> aamvaNsClaims = new HashMap<>();
+        aamvaNsClaims.put("age_over_18", new HashMap<>());
+        Map<String, Object> claims = new LinkedHashMap<>();
+        claims.put("org.iso.18013.5.1", isoNsClaims);
+        claims.put("org.iso.18013.5.1.aamva", aamvaNsClaims);
+        credentialsSupportedResponse.setClaims(claims);
+
+        CredentialDisplayResponseDto givenNameDto = createCredentialDisplayResponseDto("Given Name", "en");
+        CredentialDisplayResponseDto ageDto = createCredentialDisplayResponseDto("Age Over 18", "en");
+        when(objectMapper.convertValue(any(), eq(CredentialDisplayResponseDto.class)))
+                .thenReturn(givenNameDto, ageDto);
+
+        try (MockedStatic<LocaleUtils> mockedLocaleUtils = mockStatic(LocaleUtils.class)) {
+            mockedLocaleUtils.when(() -> LocaleUtils.resolveLocaleWithFallback(any(), eq("en"))).thenReturn("en");
+            mockedLocaleUtils.when(() -> LocaleUtils.matchesLocale(eq("en"), eq("en"))).thenReturn(true);
+
+            LinkedHashMap<String, Map<CredentialIssuerDisplayResponse, Object>> result =
+                    handler.loadDisplayPropertiesFromWellknown(credentialProperties, credentialsSupportedResponse, "en");
+
+            assertNotNull(result);
+            assertEquals(2, result.size());
+            assertTrue(result.containsKey("given_name"));
+            assertTrue(result.containsKey("age_over_18"));
+
+            CredentialIssuerDisplayResponse ageDisplay = result.get("age_over_18").keySet().iterator().next();
+            assertEquals("Age Over 18", ageDisplay.getName());
+        }
+    }
+
+    @Test
     void loadDisplayPropertiesFromWellknownWhenNullResolvedLocaleShouldUseFallbackLabel() {
         Map<String, Object> credentialProperties = Map.of("givenName", "John");
 

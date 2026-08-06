@@ -46,10 +46,14 @@ public class Draft13CredentialRequestBuilder {
     }
 
     private Draft13VCCredentialRequest buildMsoMdocCredentialRequest(VCCredentialRequestProof proof, CredentialsSupportedResponse credentialsSupportedResponse) {
+        String doctype = credentialsSupportedResponse.getDoctype();
+        if (doctype == null || doctype.isBlank()) {
+            throw new IllegalArgumentException("doctype is required for mso_mdoc credential format but is not configured in the issuer well-known");
+        }
         return Draft13VCCredentialRequest
                 .builder()
                 .format(CredentialFormat.MSO_MDOC.getFormat())
-                .doctype(credentialsSupportedResponse.getDoctype())
+                .doctype(doctype)
                 .proof(proof)
                 .build();
     }
