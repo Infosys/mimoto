@@ -94,6 +94,26 @@ public class CredentialVerifierServiceTest {
         credentialVerifier.verify(vcCredentialResponse);
     }
 
+    @Test
+    public void testVerifySdJwtWithoutKbJwtSucceeds() throws Exception {
+        // Regression: vcverifier-jar 2.0.0-SNAPSHOT defaults requireKbJwt=true via the 2-arg verify().
+        // Issued SD-JWTs have no KB-JWT (KB-JWT is only added by the holder during OID4VP presentation),
+        // so we must call verify(credential, format, false) to skip that check at download time.
+        String sdJwt = "header.payload.signature~disclosure1~";
+        VCCredentialResponse sdJwtResponse = VCCredentialResponse.builder()
+                .format(CredentialFormat.VC_SD_JWT.getValue())
+                .credential(sdJwt)
+                .build();
+
+        when(credentialsVerifier.verify(eq(sdJwt), eq(CredentialFormat.VC_SD_JWT), eq(false))).thenReturn(verificationResult);
+        when(verificationResult.getVerificationStatus()).thenReturn(true);
+
+        boolean result = credentialVerifier.verify(sdJwtResponse);
+
+        assertTrue(result);
+        verify(credentialsVerifier).verify(sdJwt, CredentialFormat.VC_SD_JWT, false);
+    }
+
     @Test(expected = NullPointerException.class)
     public void testVerifyWithNullCredential() throws Exception {
         // Arrange
