@@ -26,7 +26,8 @@ public class CredentialVerifierServiceImpl implements CredentialVerifierService 
 
     public boolean verify(VCCredentialResponse response) throws JsonProcessingException, VCVerificationException {
         String credentialString = response.getCredential() instanceof String ? (String) response.getCredential() : objectMapper.writeValueAsString(response.getCredential());
-        VerificationResult result = credentialsVerifier.verify(credentialString, Objects.requireNonNull(CredentialFormat.Companion.fromValue(response.getFormat())));
+        // requireKbJwt=false: KB-JWT is only present during OID4VP presentation, not OID4VCI issuance
+        VerificationResult result = credentialsVerifier.verify(credentialString, Objects.requireNonNull(CredentialFormat.Companion.fromValue(response.getFormat())), false);
         if (!result.getVerificationStatus()) {
             throw new VCVerificationException(result.getVerificationErrorCode().toLowerCase(), result.getVerificationMessage());
         }
