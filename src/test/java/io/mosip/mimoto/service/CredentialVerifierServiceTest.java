@@ -62,7 +62,7 @@ public class CredentialVerifierServiceTest {
     @Test
     public void testVerifySuccess() throws Exception {
         // Arrange
-        when(credentialsVerifier.verify(eq(credentialJson), eq(CredentialFormat.LDP_VC))).thenReturn(verificationResult);
+        when(credentialsVerifier.verify(eq(credentialJson), eq(CredentialFormat.LDP_VC), eq(false))).thenReturn(verificationResult);
         when(verificationResult.getVerificationStatus()).thenReturn(true);
 
         // Act
@@ -70,13 +70,13 @@ public class CredentialVerifierServiceTest {
 
         // Assert
         assertTrue(result);
-        verify(credentialsVerifier).verify(credentialJson, CredentialFormat.LDP_VC);
+        verify(credentialsVerifier).verify(credentialJson, CredentialFormat.LDP_VC, false);
     }
 
     @Test(expected = VCVerificationException.class)
     public void testVerifyFailureThrowsException() throws Exception {
         // Arrange
-        when(credentialsVerifier.verify(eq(credentialJson), eq(CredentialFormat.LDP_VC))).thenReturn(verificationResult);
+        when(credentialsVerifier.verify(eq(credentialJson), eq(CredentialFormat.LDP_VC), eq(false))).thenReturn(verificationResult);
         when(verificationResult.getVerificationStatus()).thenReturn(false);
         when(verificationResult.getVerificationErrorCode()).thenReturn("ERR_CODE");
         when(verificationResult.getVerificationMessage()).thenReturn("Verification failed");
