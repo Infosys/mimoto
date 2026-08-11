@@ -2,6 +2,7 @@ package io.mosip.mimoto.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.mosip.mimoto.constant.CredentialFormat;
+import io.mosip.mimoto.util.MdocUtil;
 import io.mosip.mimoto.dto.DecryptedCredentialDTO;
 import io.mosip.mimoto.dto.mimoto.VCCredentialProperties;
 import io.mosip.mimoto.dto.mimoto.VCCredentialResponse;
@@ -90,7 +91,8 @@ public final class DcqlMatchingHelper {
             if (!(credentialData instanceof String mdocString) || mdocString.isBlank()) {
                 return null;
             }
-            return new Credential(FormatType.MSO_MDOC, mdocString, dto.getId());
+            String mobileDocument = (String) MdocUtil.wrapIssuerSignedIfNeeded(mdocString, format, vc.getDoctype());
+            return new Credential(FormatType.MSO_MDOC, mobileDocument, dto.getId());
         }
 
         return null;

@@ -19,6 +19,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 
+import io.mosip.mimoto.dto.mimoto.CredentialsSupportedResponse;
+
+import java.util.Map;
+
 import static io.mosip.mimoto.util.TestUtilities.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -48,8 +52,10 @@ class Draft13VCDownloadHandlerTest {
         issuerDTO = new IssuerDTO();
         issuerDTO.setIssuer_id("issuer-123");
 
+        CredentialsSupportedResponse credentialsSupportedResponse = getCredentialSupportedResponse("config-1", "jwt_vc");
         wellKnownResponse = new CredentialIssuerWellKnownResponse();
         wellKnownResponse.setCredentialEndPoint("https://example.com/credential");
+        wellKnownResponse.setCredentialConfigurationsSupported(Map.of("config-1", credentialsSupportedResponse));
 
         tokenResponse = new TokenResponseDTO();
         tokenResponse.setC_nonce("nonce-123");

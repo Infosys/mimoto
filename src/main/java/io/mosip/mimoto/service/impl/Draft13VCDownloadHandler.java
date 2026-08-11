@@ -11,7 +11,6 @@ import io.mosip.mimoto.exception.ExternalServiceUnavailableException;
 import io.mosip.mimoto.exception.InvalidCredentialResourceException;
 import io.mosip.mimoto.service.Draft13CredentialRequestService;
 import io.mosip.mimoto.service.VCDownloadHandler;
-import io.mosip.mimoto.util.MdocUtil;
 import io.mosip.mimoto.util.RestApiClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -43,8 +42,11 @@ public class Draft13VCDownloadHandler implements VCDownloadHandler {
 
         String doctype = credentialIssuerWellKnownResponse.getCredentialConfigurationsSupported().get(credentialConfigurationId).getDoctype();
         VCCredentialResponse response = fetchCredential(credentialIssuerWellKnownResponse.getCredentialEndPoint(), vcCredentialRequest, tokenResponse.getAccess_token(), issuerDTO.getIssuer_id(), credentialConfigurationId);
-        Object wrappedCredential = MdocUtil.wrapIssuerSignedIfNeeded(response.getCredential(), response.getFormat(), doctype);
-        return wrappedCredential == response.getCredential() ? response : new VCCredentialResponse(response.getFormat(), wrappedCredential);
+        return VCCredentialResponse.builder()
+                .format(response.getFormat())
+                .credential(response.getCredential())
+                .doctype(doctype)
+                .build();
     }
 
     private VCCredentialResponse fetchCredential(String credentialEndpoint, Draft13VCCredentialRequest vcCredentialRequest, String accessToken, String issuerId, String credentialConfigId) throws InvalidCredentialResourceException, ExternalServiceUnavailableException {
@@ -68,6 +70,9 @@ public class Draft13VCDownloadHandler implements VCDownloadHandler {
         }
 
         log.debug("VC Credential Response received");
-        return new VCCredentialResponse(vcCredentialRequest.getFormat(), response.getCredential());
+        return VCCredentialResponse.builder()
+                .format(vcCredentialRequest.getFormat())
+                .credential(response.getCredential())
+                .build();
     }
 }
