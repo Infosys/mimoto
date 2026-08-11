@@ -108,11 +108,7 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>co.nstant.in</groupId>
-            <artifactId>cbor</artifactId>
-            <version>0.9</version>
-        </dependency>
+
         <dependency>
             <groupId>io.mosip.kernel</groupId>
             <artifactId>kernel-core</artifactId>
@@ -149,7 +145,7 @@
         <dependency>
             <groupId>io.inji</groupId>
             <artifactId>inji-openid4vp-jar</artifactId>
-            <version>1.0.0-alpha.1</version>
+            <version>1.0.0-alpha.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>

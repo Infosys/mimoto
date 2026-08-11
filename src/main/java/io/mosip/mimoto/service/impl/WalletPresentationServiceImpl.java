@@ -25,7 +25,6 @@ import io.mosip.mimoto.util.UrlParameterUtils;
 import io.mosip.mimoto.util.DcqlClaimSetHelper;
 import io.mosip.mimoto.util.DcqlMatchingHelper;
 import io.mosip.mimoto.util.DcqlCredentialSetHelper;
-import io.mosip.mimoto.util.MdocUtil;
 import io.mosip.mimoto.util.SelectedSdClaimsUtil;
 import io.mosip.openID4VP.OpenID4VP;
 import io.mosip.openID4VP.authorizationRequest.AuthorizationDcqlRequest;
@@ -376,8 +375,7 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
                 throw new InvalidRequestException(INVALID_REQUEST.getErrorCode(),
                         "Credential " + dto.getId() + " mso_mdoc data must be a String");
             }
-            String mobileDocument = (String) MdocUtil.wrapIssuerSignedIfNeeded(mdocString, vc.getFormat(), vc.getDoctype());
-            return new Credential(FormatType.MSO_MDOC, mobileDocument, dto.getId());
+            return new Credential(FormatType.MSO_MDOC, mdocString, dto.getId());
         }
         if (!CredentialFormat.LDP_VC.getFormat().equalsIgnoreCase(vc.getFormat())) {
             throw new InvalidRequestException(INVALID_REQUEST.getErrorCode(),

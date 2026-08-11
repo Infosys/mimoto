@@ -40,13 +40,7 @@ public class Draft13VCDownloadHandler implements VCDownloadHandler {
             throw new CredentialProcessingException(CREDENTIAL_DOWNLOAD_EXCEPTION.getErrorCode(), "Unable to generate credential request", e);
         }
 
-        String doctype = credentialIssuerWellKnownResponse.getCredentialConfigurationsSupported().get(credentialConfigurationId).getDoctype();
-        VCCredentialResponse response = fetchCredential(credentialIssuerWellKnownResponse.getCredentialEndPoint(), vcCredentialRequest, tokenResponse.getAccess_token(), issuerDTO.getIssuer_id(), credentialConfigurationId);
-        return VCCredentialResponse.builder()
-                .format(response.getFormat())
-                .credential(response.getCredential())
-                .doctype(doctype)
-                .build();
+        return fetchCredential(credentialIssuerWellKnownResponse.getCredentialEndPoint(), vcCredentialRequest, tokenResponse.getAccess_token(), issuerDTO.getIssuer_id(), credentialConfigurationId);
     }
 
     private VCCredentialResponse fetchCredential(String credentialEndpoint, Draft13VCCredentialRequest vcCredentialRequest, String accessToken, String issuerId, String credentialConfigId) throws InvalidCredentialResourceException, ExternalServiceUnavailableException {

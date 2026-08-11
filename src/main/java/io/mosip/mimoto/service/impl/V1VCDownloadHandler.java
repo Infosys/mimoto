@@ -70,13 +70,11 @@ public class V1VCDownloadHandler implements VCDownloadHandler {
         }
 
         String format = credentialIssuerWellKnownResponse.getCredentialConfigurationsSupported().get(credentialConfigurationId).getFormat();
-        String doctype = credentialIssuerWellKnownResponse.getCredentialConfigurationsSupported().get(credentialConfigurationId).getDoctype();
 
         log.debug("V1 VC Credential Response received for issuerId: {}", issuerId);
         return VCCredentialResponse.builder()
                 .format(format)
                 .credential(credentials.getFirst().getCredential())
-                .doctype(doctype)
                 .build();
     }
 

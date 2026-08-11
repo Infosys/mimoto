@@ -93,7 +93,6 @@ class Draft13VCDownloadHandlerTest {
         assertNotNull(result);
         assertEquals(request.getFormat(), result.getFormat());
         assertEquals(mockResponse.getCredential(), result.getCredential());
-        assertEquals("org.iso.18018", result.getDoctype());
     }
 
     @Test

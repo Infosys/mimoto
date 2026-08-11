@@ -22,6 +22,4 @@ public class VCCredentialResponse implements Serializable {
     @Valid
     @NotNull
     private Object credential;
-
-    private String doctype;
 }
