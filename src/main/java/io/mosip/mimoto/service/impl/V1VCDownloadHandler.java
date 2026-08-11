@@ -12,6 +12,7 @@ import io.mosip.mimoto.exception.ExternalServiceUnavailableException;
 import io.mosip.mimoto.exception.InvalidCredentialResourceException;
 import io.mosip.mimoto.service.V1CredentialRequestService;
 import io.mosip.mimoto.service.VCDownloadHandler;
+import io.mosip.mimoto.util.MdocUtil;
 import io.mosip.mimoto.util.RestApiClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -70,9 +71,11 @@ public class V1VCDownloadHandler implements VCDownloadHandler {
         }
 
         String format = credentialIssuerWellKnownResponse.getCredentialConfigurationsSupported().get(credentialConfigurationId).getFormat();
+        String doctype = credentialIssuerWellKnownResponse.getCredentialConfigurationsSupported().get(credentialConfigurationId).getDoctype();
 
+        Object credentialData = MdocUtil.wrapIssuerSignedIfNeeded(credentials.getFirst().getCredential(), format, doctype);
         log.debug("V1 VC Credential Response received for issuerId: {}", issuerId);
-        return new VCCredentialResponse(format, credentials.getFirst().getCredential());
+        return new VCCredentialResponse(format, credentialData);
     }
 
     private V1VCCredentialRequest buildCredentialRequest(IssuerDTO issuerDTO, String credentialConfigurationId, CredentialIssuerWellKnownResponse wellKnownResponse, String walletId, String base64Key, boolean isLoginFlow) throws CredentialProcessingException {
