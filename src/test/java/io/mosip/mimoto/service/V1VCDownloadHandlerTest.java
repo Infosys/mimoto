@@ -400,4 +400,44 @@ class V1VCDownloadHandlerTest {
         verify(restApiClient, times(1))
                 .postApiWithErrorResponse(anyString(), any(), any(), any(), anyString());
     }
+
+    @Test
+    void shouldPopulateDoctypeFromWellknownForMsoMdocCredential() throws Exception {
+        String mdocConfigId = "mDL_credential";
+        String mdocDoctype = "org.iso.18013.5.1.mDL";
+        String mdocCredentialData = "base64url-encoded-issuer-signed";
+
+        ProofTypesSupported proofTypes = new ProofTypesSupported();
+        proofTypes.setProofSigningAlgValuesSupported(List.of("ES256"));
+
+        CredentialsSupportedResponse mdocConfig = new CredentialsSupportedResponse();
+        mdocConfig.setFormat("mso_mdoc");
+        mdocConfig.setDoctype(mdocDoctype);
+        mdocConfig.setProofTypesSupported(Map.of("jwt", proofTypes));
+
+        CredentialIssuerWellKnownResponse mdocWellKnown = new CredentialIssuerWellKnownResponse();
+        mdocWellKnown.setCredentialIssuer(CREDENTIAL_ISSUER);
+        mdocWellKnown.setCredentialEndPoint(CREDENTIAL_ENDPOINT);
+        mdocWellKnown.setCredentialConfigurationsSupported(Map.of(mdocConfigId, mdocConfig));
+
+        V1VCCredentialRequest request = buildRequest("jwt-token");
+        when(v1CredentialRequestService.buildRequest(eq(issuerDTO), eq(mdocConfigId),
+                eq(mdocWellKnown), isNull(), isNull(), eq(false)))
+                .thenReturn(request);
+
+        V1VCCredentialResponse mockResponse = V1VCCredentialResponse.builder()
+                .credentials(List.of(v1Credential(mdocCredentialData)))
+                .build();
+        when(restApiClient.postApiWithErrorResponse(eq(CREDENTIAL_ENDPOINT), eq(MediaType.APPLICATION_JSON),
+                eq(request), eq(V1VCCredentialResponse.class), eq(ACCESS_TOKEN)))
+                .thenReturn(mockResponse);
+
+        VCCredentialResponse result = handler.downloadCredential(
+                issuerDTO, mdocConfigId, mdocWellKnown, tokenResponse, null, null, false);
+
+        assertNotNull(result);
+        assertEquals("mso_mdoc", result.getFormat());
+        assertEquals(mdocDoctype, result.getDoctype());
+        assertEquals(mdocCredentialData, result.getCredential());
+    }
 }

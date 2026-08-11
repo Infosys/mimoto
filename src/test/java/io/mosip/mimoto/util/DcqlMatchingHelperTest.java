@@ -1,5 +1,9 @@
 package io.mosip.mimoto.util;
 
+import co.nstant.in.cbor.CborDecoder;
+import co.nstant.in.cbor.CborEncoder;
+import co.nstant.in.cbor.model.Array;
+import co.nstant.in.cbor.model.UnicodeString;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.mosip.mimoto.constant.CredentialFormat;
 import io.mosip.mimoto.dto.DecryptedCredentialDTO;
@@ -16,6 +20,7 @@ import io.mosip.openID4VP.helper.DCQLHelper;
 import io.mosip.openID4VP.wallet.Credential;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +30,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class DcqlMatchingHelperTest {
@@ -123,11 +129,82 @@ public class DcqlMatchingHelperTest {
         assertEquals(Set.of("age_above_18"), missingClaims);
     }
 
+    @Test
+    public void toLibraryCredential_msoMdocWithValidIssuerSigned_wrapsToMobileDocument() throws Exception {
+        String issuerSigned = buildIssuerSignedB64();
+        DecryptedCredentialDTO dto = mdocCredential("cred-mdoc-1", issuerSigned, "org.iso.18013.5.1.mDL");
+
+        Credential credential = DcqlMatchingHelper.toLibraryCredential(dto, objectMapper);
+
+        assertNotNull(credential);
+        assertEquals(FormatType.MSO_MDOC, credential.getFormat());
+        assertEquals("cred-mdoc-1", credential.getCredentialId());
+
+        byte[] decoded = Base64.getUrlDecoder().decode((String) credential.getData());
+        co.nstant.in.cbor.model.Map map = (co.nstant.in.cbor.model.Map) CborDecoder.decode(decoded).get(0);
+        assertEquals("org.iso.18013.5.1.mDL", map.get(new UnicodeString("docType")).toString());
+        assertNotNull(map.get(new UnicodeString("issuerSigned")));
+    }
+
+    @Test
+    public void toLibraryCredential_msoMdocAlreadyMobileDocument_isNotDoubleWrapped() throws Exception {
+        String mobileDoc = buildMobileDocumentB64();
+        DecryptedCredentialDTO dto = mdocCredential("cred-mdoc-2", mobileDoc, "org.iso.18013.5.1.mDL");
+
+        Credential credential = DcqlMatchingHelper.toLibraryCredential(dto, objectMapper);
+
+        assertNotNull(credential);
+        assertEquals(FormatType.MSO_MDOC, credential.getFormat());
+        assertEquals(mobileDoc, credential.getData());
+    }
+
+    @Test
+    public void toLibraryCredential_msoMdocWithBlankCredential_returnsNull() {
+        DecryptedCredentialDTO dto = mdocCredential("cred-mdoc-3", "   ", "org.iso.18013.5.1.mDL");
+
+        Credential credential = DcqlMatchingHelper.toLibraryCredential(dto, objectMapper);
+
+        assertNull(credential);
+    }
+
     private static DecryptedCredentialDTO walletCredential(String id, String format, Object payload) {
         DecryptedCredentialDTO dto = new DecryptedCredentialDTO();
         dto.setId(id);
         dto.setCredential(VCCredentialResponse.builder().format(format).credential(payload).build());
         return dto;
+    }
+
+    private static DecryptedCredentialDTO mdocCredential(String id, Object payload, String doctype) {
+        DecryptedCredentialDTO dto = new DecryptedCredentialDTO();
+        dto.setId(id);
+        dto.setCredential(VCCredentialResponse.builder()
+                .format(CredentialFormat.MSO_MDOC.getFormat())
+                .credential(payload)
+                .doctype(doctype)
+                .build());
+        return dto;
+    }
+
+    private static String buildIssuerSignedB64() throws Exception {
+        co.nstant.in.cbor.model.Map issuerSigned = new co.nstant.in.cbor.model.Map();
+        issuerSigned.put(new UnicodeString("nameSpaces"), new co.nstant.in.cbor.model.Map());
+        issuerSigned.put(new UnicodeString("issuerAuth"), new Array());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        new CborEncoder(baos).encode(issuerSigned);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(baos.toByteArray());
+    }
+
+    private static String buildMobileDocumentB64() throws Exception {
+        co.nstant.in.cbor.model.Map issuerSigned = new co.nstant.in.cbor.model.Map();
+        issuerSigned.put(new UnicodeString("nameSpaces"), new co.nstant.in.cbor.model.Map());
+
+        co.nstant.in.cbor.model.Map mobileDocument = new co.nstant.in.cbor.model.Map();
+        mobileDocument.put(new UnicodeString("docType"), new UnicodeString("org.iso.18013.5.1.mDL"));
+        mobileDocument.put(new UnicodeString("issuerSigned"), issuerSigned);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        new CborEncoder(baos).encode(mobileDocument);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(baos.toByteArray());
     }
 
     private static String buildSdJwtToken(Map<String, Object> payload) throws Exception {

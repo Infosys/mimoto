@@ -33,9 +33,14 @@ import io.mosip.openID4VP.authorizationRequest.clientMetadata.ClientMetadataDraf
 import io.mosip.openID4VP.authorizationResponse.unsignedVPToken.UnsignedVPToken;
 import io.mosip.openID4VP.authorizationResponse.vpTokenSigningResult.VPTokenSigningResult;
 import io.mosip.openID4VP.common.OpenID4VPErrorCodes;
+import co.nstant.in.cbor.CborDecoder;
+import co.nstant.in.cbor.CborEncoder;
+import co.nstant.in.cbor.model.Array;
+import co.nstant.in.cbor.model.UnicodeString;
 import io.mosip.openID4VP.constants.FormatType;
 import io.mosip.openID4VP.exceptions.OpenID4VPExceptions;
 import io.mosip.openID4VP.verifier.VerifierResponse;
+import io.mosip.openID4VP.wallet.Credential;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,6 +50,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.ArgumentCaptor;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -2339,5 +2345,65 @@ public class WalletPresentationServiceTest {
             verify(keyPairService, times(1)).getKeyPairFromDB(eq("wallet-1"), eq("base64Key"), eq(SigningAlgorithm.ES256));
             verify(jwsSigner, times(2)).sign(any(JWSHeader.class), eq(kbt.getBytes(StandardCharsets.US_ASCII)));
         }
+    }
+
+    @Test
+    public void testToLibraryCredentialMsoMdocWrapsIssuerSignedToMobileDocument() throws Exception {
+        Method method = WalletPresentationServiceImpl.class.getDeclaredMethod(
+                "toLibraryCredential", DecryptedCredentialDTO.class, Map.class);
+        method.setAccessible(true);
+
+        String issuerSignedB64 = buildIssuerSignedB64();
+        DecryptedCredentialDTO dto = DecryptedCredentialDTO.builder()
+                .id("mdoc-cred-1")
+                .credential(VCCredentialResponse.builder()
+                        .format(CredentialFormat.MSO_MDOC.getFormat())
+                        .credential(issuerSignedB64)
+                        .doctype("org.iso.18013.5.1.mDL")
+                        .build())
+                .build();
+
+        Credential result = (Credential) method.invoke(walletPresentationService, dto, null);
+
+        assertNotNull(result);
+        assertEquals(FormatType.MSO_MDOC, result.getFormat());
+        assertEquals("mdoc-cred-1", result.getCredentialId());
+
+        byte[] decoded = Base64.getUrlDecoder().decode((String) result.getData());
+        co.nstant.in.cbor.model.Map map = (co.nstant.in.cbor.model.Map) CborDecoder.decode(decoded).get(0);
+        assertEquals("org.iso.18013.5.1.mDL", map.get(new UnicodeString("docType")).toString());
+    }
+
+    @Test
+    public void testToLibraryCredentialMsoMdocNonStringCredentialThrowsInvalidRequest() throws Exception {
+        Method method = WalletPresentationServiceImpl.class.getDeclaredMethod(
+                "toLibraryCredential", DecryptedCredentialDTO.class, Map.class);
+        method.setAccessible(true);
+
+        DecryptedCredentialDTO dto = DecryptedCredentialDTO.builder()
+                .id("mdoc-cred-2")
+                .credential(VCCredentialResponse.builder()
+                        .format(CredentialFormat.MSO_MDOC.getFormat())
+                        .credential(Map.of("unexpected", "map"))
+                        .doctype("org.iso.18013.5.1.mDL")
+                        .build())
+                .build();
+
+        try {
+            method.invoke(walletPresentationService, dto, null);
+            fail("Expected InvocationTargetException wrapping InvalidRequestException");
+        } catch (InvocationTargetException e) {
+            assertTrue(e.getCause() instanceof InvalidRequestException);
+            assertTrue(e.getCause().getMessage().contains("mso_mdoc data must be a String"));
+        }
+    }
+
+    private static String buildIssuerSignedB64() throws Exception {
+        co.nstant.in.cbor.model.Map issuerSigned = new co.nstant.in.cbor.model.Map();
+        issuerSigned.put(new UnicodeString("nameSpaces"), new co.nstant.in.cbor.model.Map());
+        issuerSigned.put(new UnicodeString("issuerAuth"), new Array());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        new CborEncoder(baos).encode(issuerSigned);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(baos.toByteArray());
     }
 }
