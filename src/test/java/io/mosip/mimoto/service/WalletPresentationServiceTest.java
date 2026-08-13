@@ -2343,6 +2343,42 @@ public class WalletPresentationServiceTest {
     }
 
     @Test
+    public void testSignVPTokensMsoMdocSignsRawCborBytesWithoutDotSplit() throws Exception {
+        Method method = WalletPresentationServiceImpl.class.getDeclaredMethod(
+                "signVPTokens", List.class, String.class, String.class);
+        method.setAccessible(true);
+
+        byte[] cborBytes = new byte[]{(byte) 0x84, 0x01, 0x02, 0x03};
+
+        UnsignedVPToken mockToken = mock(UnsignedVPToken.class);
+        when(mockToken.getId()).thenReturn("mdoc-token-1");
+        when(mockToken.getFormat()).thenReturn(FormatType.MSO_MDOC);
+        when(mockToken.getDataToSign()).thenReturn(cborBytes);
+        when(mockToken.getSignatureAlgorithm()).thenReturn("ES256");
+        when(jwsSigner.sign(any(JWSHeader.class), any(byte[].class))).thenReturn(Base64URL.encode("mdoc-sig"));
+
+        KeyPair mockKeyPair = mock(KeyPair.class);
+        JWK mockJwk = mock(JWK.class);
+        when(keyPairService.getKeyPairFromDB(eq("wallet-1"), eq("base64Key"), eq(SigningAlgorithm.ES256)))
+                .thenReturn(mockKeyPair);
+
+        try (MockedStatic<SigningKeyUtil> mockedSigningKeyUtil = mockStatic(SigningKeyUtil.class)) {
+            mockedSigningKeyUtil.when(() -> SigningKeyUtil.generateJwk(SigningAlgorithm.ES256, mockKeyPair))
+                    .thenReturn(mockJwk);
+            mockedSigningKeyUtil.when(() -> SigningKeyUtil.createSigner(SigningAlgorithm.ES256, mockJwk))
+                    .thenReturn(jwsSigner);
+
+            @SuppressWarnings("unchecked")
+            List<VPTokenSigningResult> results = (List<VPTokenSigningResult>) method.invoke(
+                    walletPresentationService, List.of(mockToken), "wallet-1", "base64Key");
+
+            assertEquals(1, results.size());
+            verify(jwsSigner).sign(any(JWSHeader.class), eq(cborBytes));
+            assertArrayEquals(Base64URL.encode("mdoc-sig").decode(), results.get(0).getSignedData());
+        }
+    }
+
+    @Test
     public void testToLibraryCredentialMsoMdocWithStringCredentialReturnsMsoMdocCredential() throws Exception {
         Method method = WalletPresentationServiceImpl.class.getDeclaredMethod(
                 "toLibraryCredential", DecryptedCredentialDTO.class, Map.class);
