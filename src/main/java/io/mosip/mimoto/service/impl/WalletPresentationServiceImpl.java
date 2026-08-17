@@ -369,26 +369,24 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
             String sdJwt = buildFilteredSdJwt(
                     dto, selectedSdClaims != null ? selectedSdClaims.get(dto.getId()) : null);
             return new Credential(format, sdJwt, dto.getId());
-        }
-        if (CredentialFormat.MSO_MDOC.getFormat().equalsIgnoreCase(vc.getFormat())) {
+        } else if (CredentialFormat.MSO_MDOC.getFormat().equalsIgnoreCase(vc.getFormat())) {
             if (!(vc.getCredential() instanceof String mdocString)) {
                 throw new InvalidRequestException(INVALID_REQUEST.getErrorCode(),
                         "Credential " + dto.getId() + " mso_mdoc data must be a String");
             }
             return new Credential(FormatType.MSO_MDOC, mdocString, dto.getId());
-        }
-        if (!CredentialFormat.LDP_VC.getFormat().equalsIgnoreCase(vc.getFormat())) {
+        } else if (CredentialFormat.LDP_VC.getFormat().equalsIgnoreCase(vc.getFormat())) {
+            // inji-openid4vp expects LDP credentials as a JSON object (Map), not a typed POJO.
+            Credential mapped = DcqlMatchingHelper.toLibraryCredential(dto, objectMapper);
+            if (mapped == null) {
+                throw new InvalidRequestException(INVALID_REQUEST.getErrorCode(),
+                        "Credential " + dto.getId() + " could not be mapped for OpenID4VP submission");
+            }
+            return mapped;
+        } else {
             throw new InvalidRequestException(INVALID_REQUEST.getErrorCode(),
                     "Unsupported credential format: " + vc.getFormat());
         }
-        // inji-openid4vp expects LDP credentials as a JSON object (Map), not a typed POJO.
-        Credential mapped = DcqlMatchingHelper.toLibraryCredential(dto, objectMapper);
-        if (mapped == null) {
-            throw new InvalidRequestException(INVALID_REQUEST.getErrorCode(),
-                    "Credential " + dto.getId() + " could not be mapped for OpenID4VP submission");
-        }
-
-        return mapped;
     }
 
     private void validateDcqlSelections(SubmitPresentationRequestDTO request, VerifiablePresentationSessionData sessionData)
