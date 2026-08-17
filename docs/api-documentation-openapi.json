@@ -3154,9 +3154,14 @@
                                 },
                                 "Presentation Submission Request (SD-JWT with selective disclosure)": {
                                     "value": {
-                                        "selectedCredentials": ["cred-123"],
+                                        "selectedCredentials": [
+                                            "cred-123"
+                                        ],
                                         "selectedSdClaims": {
-                                            "cred-123": ["name", "dob"]
+                                            "cred-123": [
+                                                "name",
+                                                "dob"
+                                            ]
                                         }
                                     }
                                 },
@@ -3813,148 +3818,151 @@
         },
         "/verifiers": {
             "get": {
-            "operationId": "getAllTrustedVerifiers",
-        "tags": [
-            "Verifiers"
-        ],
-        "summary": "List Trusted Verifiers",
-        "description": "Returns the trusted verifier clients configured for the wallet experience. Use this API when the client needs to display or validate the verifier applications that are allowed to initiate presentation flows. The response contains the configured verifier identifiers and their registered redirect and response URIs.",
-        "responses": {
-        "200": {
-        "description": "Trusted verifier list returned when the wallet requests all verifier clients that are allowed to initiate presentation flows.",
-        "content": {
-        "application/json": {
-        "schema": {
-        "type": "object",
-        "properties": {
-        "response": {
-        "type": "object",
-        "properties": {
-        "verifiers": {
-        "type": "array",
-        "items": {
-        "type": "object",
-        "properties": {
-        "client_id": {
-        "type": "string",
-        "description": "OAuth2 client identifier registered for the verifier or issuer.",
-        "example": "https://injiverify.collab.mosip.net"
-        },
-        "redirect_uris": {
-        "type": "array",
-        "items": {
-        "type": "string"
-        },
-        "description": "Allowed redirect URIs registered for the verifier or issuer client.",
-        "example": [
-        "https://example.com/resource"
-        ]
-        },
-        "response_uris": {
-        "type": "array",
-        "items": {
-        "type": "string"
-        },
-        "description": "Allowed response URIs to which wallet results or callbacks may be sent.",
-        "example": [
-        "https://example.com/resource"
-        ]
-        },
-        "allow_unsigned_request": {
-        "type": "boolean",
-        "description": "Indicates whether the verifier allows unsigned requests or not.",
-        "example": false,
-        "default": false
-        },
-        "spec_version": {
-        "type": "string",
-        "enum": ["draft23", "v1"],
-        "description": "OpenID4VP specification version supported by the Verifier.",
-        "example": "v1",
-        "default": "v1"
-        }
-        },
-        "description": "Trusted verifier client metadata returned by the API."
-        },
-        "description": "List of trusted verifier clients configured for wallet or presentation flows.",
-        "example": [
-        {
-        "client_id": "https://injiverify.collab.mosip.net",
-        "redirect_uris": [
-        "https://example.com/resource"
-        ],
-        "response_uris": [
-        "https://example.com/resource"
-        ],
-        "allow_unsigned_request": false,
-        "spec_version": "v1"
-        }
-        ]
-        }
-        },
-        "description": "Business response payload returned when the request is processed successfully."
-        },
-        "errors": {
-        "type": "array",
-        "items": {
-        "type": "object",
-        "properties": {
-        "errorCode": {
-        "type": "string",
-        "description": "Machine-readable error code that identifies the failure condition.",
-        "example": "VERIFIER-API-26"
-        },
-        "errorMessage": {
-        "type": "string",
-        "description": "Human-readable message describing the reason for the error.",
-        "example": "API not accessible failure"
-        }
-        },
-        "description": "Error entry describing a single business or validation failure."
-        },
-        "description": "List of business or validation errors returned for the request. This field is null or empty for a successful response.",
-        "example": []
-        }
-        },
-        "description": "Trusted verifier list returned when the wallet requests all verifier clients that are allowed to initiate presentation flows."
-        },
-        "examples": {
-        "Success response": {
-        "value": {
-        "response": {
-        "verifiers": [
-        {
-        "client_id": "https://injiverify.collab.mosip.net",
-        "redirect_uris": [
-        "https://injiverify.collab.mosip.net/redirect"
-        ],
-        "response_uris": [
-        "https://injiverify.collab.mosip.net/redirect"
-        ],
-        "allow_unsigned_request": false,
-        "spec_version": "v1"
-        }
-        ]
-        },
-        "errors": []
-        }
-        },
-        "Failure response": {
-        "value": {
-        "errors": [
-        {
-        "errorCode": "VERIFIER-API-26",
-        "errorMessage": "API not accessible failure"
-        }
-        ]
-        }
-        }
-        }
-        }
-        }
-        }
-        }
-        }
+                "operationId": "getAllTrustedVerifiers",
+                "tags": [
+                    "Verifiers"
+                ],
+                "summary": "List Trusted Verifiers",
+                "description": "Returns the trusted verifier clients configured for the wallet experience. Use this API when the client needs to display or validate the verifier applications that are allowed to initiate presentation flows. The response contains the configured verifier identifiers and their registered redirect and response URIs.",
+                "responses": {
+                    "200": {
+                        "description": "Trusted verifier list returned when the wallet requests all verifier clients that are allowed to initiate presentation flows.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "response": {
+                                            "type": "object",
+                                            "properties": {
+                                                "verifiers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "client_id": {
+                                                                "type": "string",
+                                                                "description": "OAuth2 client identifier registered for the verifier or issuer.",
+                                                                "example": "https://injiverify.collab.mosip.net"
+                                                            },
+                                                            "redirect_uris": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                },
+                                                                "description": "Allowed redirect URIs registered for the verifier or issuer client.",
+                                                                "example": [
+                                                                    "https://example.com/resource"
+                                                                ]
+                                                            },
+                                                            "response_uris": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                },
+                                                                "description": "Allowed response URIs to which wallet results or callbacks may be sent.",
+                                                                "example": [
+                                                                    "https://example.com/resource"
+                                                                ]
+                                                            },
+                                                            "allow_unsigned_request": {
+                                                                "type": "boolean",
+                                                                "description": "Indicates whether the verifier allows unsigned requests or not.",
+                                                                "example": false,
+                                                                "default": false
+                                                            },
+                                                            "spec_version": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "draft23",
+                                                                    "v1"
+                                                                ],
+                                                                "description": "OpenID4VP specification version supported by the Verifier.",
+                                                                "example": "v1",
+                                                                "default": "v1"
+                                                            }
+                                                        },
+                                                        "description": "Trusted verifier client metadata returned by the API."
+                                                    },
+                                                    "description": "List of trusted verifier clients configured for wallet or presentation flows.",
+                                                    "example": [
+                                                        {
+                                                            "client_id": "https://injiverify.collab.mosip.net",
+                                                            "redirect_uris": [
+                                                                "https://example.com/resource"
+                                                            ],
+                                                            "response_uris": [
+                                                                "https://example.com/resource"
+                                                            ],
+                                                            "allow_unsigned_request": false,
+                                                            "spec_version": "v1"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "description": "Business response payload returned when the request is processed successfully."
+                                        },
+                                        "errors": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "errorCode": {
+                                                        "type": "string",
+                                                        "description": "Machine-readable error code that identifies the failure condition.",
+                                                        "example": "VERIFIER-API-26"
+                                                    },
+                                                    "errorMessage": {
+                                                        "type": "string",
+                                                        "description": "Human-readable message describing the reason for the error.",
+                                                        "example": "API not accessible failure"
+                                                    }
+                                                },
+                                                "description": "Error entry describing a single business or validation failure."
+                                            },
+                                            "description": "List of business or validation errors returned for the request. This field is null or empty for a successful response.",
+                                            "example": []
+                                        }
+                                    },
+                                    "description": "Trusted verifier list returned when the wallet requests all verifier clients that are allowed to initiate presentation flows."
+                                },
+                                "examples": {
+                                    "Success response": {
+                                        "value": {
+                                            "response": {
+                                                "verifiers": [
+                                                    {
+                                                        "client_id": "https://injiverify.collab.mosip.net",
+                                                        "redirect_uris": [
+                                                            "https://injiverify.collab.mosip.net/redirect"
+                                                        ],
+                                                        "response_uris": [
+                                                            "https://injiverify.collab.mosip.net/redirect"
+                                                        ],
+                                                        "allow_unsigned_request": false,
+                                                        "spec_version": "v1"
+                                                    }
+                                                ]
+                                            },
+                                            "errors": []
+                                        }
+                                    },
+                                    "Failure response": {
+                                        "value": {
+                                            "errors": [
+                                                {
+                                                    "errorCode": "VERIFIER-API-26",
+                                                    "errorMessage": "API not accessible failure"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         },
         "/v2/issuers": {
             "get": {
@@ -5270,7 +5278,10 @@
                         },
                         "description": "Optional. Selected SD-JWT claim paths per credential ID for selective disclosure (only for SD-JWT credentials: vc+sd-jwt and dc+sd-jwt). Keyed by credential ID; values are the claim paths to disclose. Only the explicitly selected disclosures are shared; when omitted (or empty) for an SD-JWT credential, none of its selectively-disclosable claims are shared.",
                         "example": {
-                            "cred-123": ["name", "dob"]
+                            "cred-123": [
+                                "name",
+                                "dob"
+                            ]
                         }
                     }
                 },
