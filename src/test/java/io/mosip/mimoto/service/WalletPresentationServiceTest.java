@@ -1506,11 +1506,9 @@ public class WalletPresentationServiceTest {
                     .thenReturn("test-client");
 
             
-            try {
-                walletPresentationService.submitPresentation(
-                        nullSessionData, walletId, presentationId, submitRequest, base64Key);
-            } catch (Exception e) {
-            }
+            assertThrows(Exception.class, () ->
+                    walletPresentationService.submitPresentation(
+                            nullSessionData, walletId, presentationId, submitRequest, base64Key));
         }
     }
 
