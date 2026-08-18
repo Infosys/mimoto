@@ -637,8 +637,7 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
         Map<String, List<ClaimsQuery>> index = new LinkedHashMap<>();
         for (MatchingCredential mc : queryMatch.getMatchingCredentials()) {
             if (mc.getCredentialId() != null) {
-                index.putIfAbsent(mc.getCredentialId(),
-                        mc.getMatchingClaims() != null ? mc.getMatchingClaims() : Collections.emptyList());
+                index.putIfAbsent(mc.getCredentialId(), mc.getMatchingClaims());
             }
         }
         return index;
