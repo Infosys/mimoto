@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -156,7 +157,11 @@ public class OpenID4VPService {
     }
 
     public List<Verifier> getPreRegisteredVerifiers() throws ApiNotAccessibleException, IOException {
-        return verifierService.getTrustedVerifiers().getVerifiers().stream()
+        List<io.mosip.mimoto.dto.openid.VerifierDTO> verifiers = verifierService.getTrustedVerifiers().getVerifiers();
+        if (verifiers == null) {
+            return Collections.emptyList();
+        }
+        return verifiers.stream()
                 .map(v -> new Verifier(v.getClientId(), v.getResponseUris(), v.getJwksUri(), v.getAllowUnsignedRequest(), v.getSpecVersion()))
                 .toList();
     }

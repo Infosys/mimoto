@@ -55,6 +55,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -187,7 +188,7 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
                    KeyGenerationException, DecryptionException, OpenID4VPExceptions {
 
         validateSubmissionRequest(request);
-        LocalDateTime requestedAt = LocalDateTime.now();
+        LocalDateTime requestedAt = LocalDateTime.now(ZoneOffset.UTC);
 
         // Step 1: Create OpenID4VP instance and authenticate the verifier from session data
         List<Verifier> preRegisteredVerifiers = openID4VPService.getPreRegisteredVerifiers();
@@ -801,7 +802,7 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
     private VerifiablePresentationVerifierDTO createVPResponseVerifierDTO(
             List<Verifier> preRegisteredVerifiers, AuthorizationRequest authorizationRequest, String walletId) {
         boolean preRegistered = preRegisteredVerifiers.stream()
-                .map(Verifier::getClientId).anyMatch(id -> id.equals(authorizationRequest.getClientId()));
+                .map(Verifier::getClientId).anyMatch(id -> Objects.equals(id, authorizationRequest.getClientId()));
         boolean trusted = verifierService.isVerifierTrustedByWallet(authorizationRequest.getClientId(), walletId);
         String clientName = resolveClientName(authorizationRequest);
         String logo = resolveLogoUri(authorizationRequest);
