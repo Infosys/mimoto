@@ -52,7 +52,7 @@ public class CredentialsController {
             @ApiResponse(responseCode = "200", content = {@Content(mediaType = "application/pdf")}),
             @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = ResponseWrapper.class), mediaType = "application/json")})})
     @PostMapping("/download")
-    public ResponseEntity<?> downloadCredentialAsPDF(@RequestParam Map<String, String> params) {
+    public ResponseEntity<Object> downloadCredentialAsPDF(@RequestParam Map<String, String> params) {
         //TODO: remove this default value after the apitest is updated
         params.putIfAbsent("vcStorageExpiryLimitInTimes", "-1");
 

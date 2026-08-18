@@ -17,6 +17,7 @@ import io.mosip.mimoto.service.impl.IssuersServiceImpl;
 import io.mosip.mimoto.util.IssuerConfigUtil;
 import io.mosip.mimoto.util.Utilities;
 import org.junit.Before;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -82,6 +83,7 @@ public class IssuersServiceTest {
         Mockito.when(issuersConfigUtil.getAuthServerWellknown(authServerWellknownUrl)).thenReturn(expectedCredentialIssuerConfiguration.getAuthorizationServerWellKnownResponse());
 
         issuersService = new IssuersServiceImpl(utilities, objectMapper, issuersConfigUtil, publicUrl, context);
+        ReflectionTestUtils.setField(issuersService, "self", issuersService);
     }
 
     @Test
@@ -461,6 +463,7 @@ public class IssuersServiceTest {
 
         IssuersServiceImpl serviceWithConfig = new IssuersServiceImpl(
                 utilities, objectMapper, issuersConfigUtil, publicUrl, context);
+        ReflectionTestUtils.setField(serviceWithConfig, "self", serviceWithConfig);
 
         String issuerIdMissing = "IssuerV2-Missing";
         String issuerIdExisting = "Issuer-Existing";

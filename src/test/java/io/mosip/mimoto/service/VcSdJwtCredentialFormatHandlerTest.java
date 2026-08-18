@@ -552,7 +552,8 @@ class VcSdJwtCredentialFormatHandlerTest {
             jwtPayload.put("iss", "https://example.com");
             mockedJwtUtils.when(() -> JwtUtils.parseJwtPayload(sampleJwtString)).thenReturn(jwtPayload);
 
-            Map<String, Map<String, Object>> result = (Map<String, Map<String, Object>>)
+            @SuppressWarnings("unchecked")
+            Map<String, Map<String, Object>> result = (Map<String, Map<String, Object>>) (Map<?, ?>)
                     vcSdJwtCredentialFormatHandler.extractAllCredentialProperties(vcCredentialResponse);
 
             assertNotNull(result);

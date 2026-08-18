@@ -134,7 +134,6 @@ public class CredentialPDFGeneratorService {
             String userLocale) throws IOException, WriterException {
 
         Map<String, Object> data = new HashMap<>();
-        LinkedHashMap<String, Object> rowProperties = new LinkedHashMap<>();
 
         CredentialSupportedDisplayResponse resolvedDisplay =
                 Optional.ofNullable(credentialsSupportedResponse.getDisplay())
@@ -147,29 +146,54 @@ public class CredentialPDFGeneratorService {
 
         String backgroundColor = resolvedDisplay != null ? resolvedDisplay.getBackgroundColor() : null;
         String backgroundImage = resolvedDisplay != null && resolvedDisplay.getBackgroundImage() != null
-                ? resolvedDisplay.getBackgroundImage().getUri()
-                : null;
+                ? resolvedDisplay.getBackgroundImage().getUri() : null;
         String textColor = resolvedDisplay != null ? resolvedDisplay.getTextColor() : null;
         String credentialSupportedType = resolvedDisplay != null ? resolvedDisplay.getName() : null;
 
         SelectedFace selectedFace = extractFace(vcCredentialResponse);
-        String face = selectedFace.face();
-        String selectedFaceKey = selectedFace.key();
+        Set<String> disclosures = resolveDisclosures(vcCredentialResponse);
+        RowPropertiesResult rowResult = buildRowProperties(displayProperties, selectedFace.key(), disclosures);
+        String qrCodeImage = generateQRCode(issuerDTO, vcCredentialResponse, dataShareUrl);
+        boolean isSdJwtWithDisclosures = CredentialFormat.VC_SD_JWT.getFormat().equals(vcCredentialResponse.getFormat())
+                && CollectionUtils.isNotEmpty(disclosures);
 
-        Set<String> disclosures;
+        data.put("isMaskedOn", maskDisclosures);
+        data.put("isSdJwtWithDisclosures", isSdJwtWithDisclosures);
+        data.put("qrCodeImage", qrCodeImage);
+        data.put("credentialValidity", credentialValidity);
+        data.put("logoUrl", issuerDTO.getDisplay().stream().map(d -> d.getLogo().getUrl()).findFirst().orElse(""));
+        data.put("rowProperties", rowResult.rowProperties());
+        data.put("disclosures", rowResult.disclosuresProps());
+        data.put("textColor", textColor);
+        data.put("backgroundColor", backgroundColor);
+        data.put("backgroundImage", backgroundImage);
+        data.put("titleName", credentialSupportedType);
+        data.put("face", selectedFace.face());
+        return data;
+    }
+
+    private Set<String> resolveDisclosures(VCCredentialResponse vcCredentialResponse) {
         if (CredentialFormat.VC_SD_JWT.getFormat().equals(vcCredentialResponse.getFormat())) {
             SDJWT sdjwt = SDJWT.parse((String) vcCredentialResponse.getCredential());
-            disclosures = sdjwt.getDisclosures().stream()
+            return sdjwt.getDisclosures().stream()
                     .map(Disclosure::getClaimName)
                     .collect(Collectors.toSet());
-        } else {
-            disclosures = new LinkedHashSet<>();
         }
+        return new LinkedHashSet<>();
+    }
 
+    private record RowPropertiesResult(
+            LinkedHashMap<String, Object> rowProperties,
+            LinkedHashMap<String, String> disclosuresProps) {}
+
+    private RowPropertiesResult buildRowProperties(
+            LinkedHashMap<String, Map<CredentialIssuerDisplayResponse, Object>> displayProperties,
+            String selectedFaceKey,
+            Set<String> disclosures) {
+        LinkedHashMap<String, Object> rowProperties = new LinkedHashMap<>();
         LinkedHashMap<String, String> disclosuresProps = new LinkedHashMap<>();
         displayProperties.forEach((key, valueMap) -> {
             boolean isFaceKey = selectedFaceKey != null && key.trim().equals(selectedFaceKey);
-
             valueMap.forEach((display, val) -> {
                 String displayName = display.getName();
                 String locale = display.getLocale();
@@ -185,36 +209,19 @@ public class CredentialPDFGeneratorService {
                 }
             });
         });
+        return new RowPropertiesResult(rowProperties, disclosuresProps);
+    }
 
-        String qrCodeImage = "";
+    private String generateQRCode(IssuerDTO issuerDTO, VCCredentialResponse vcCredentialResponse, String dataShareUrl)
+            throws IOException, WriterException {
         if (QRCodeType.OnlineSharing.equals(issuerDTO.getQr_code_type())) {
-            qrCodeImage = constructQRCodeWithAuthorizeRequest(vcCredentialResponse, dataShareUrl);
-        } else if (QRCodeType.EmbeddedVC.equals(issuerDTO.getQr_code_type())) {
-            String claim169Qr = extractClaim169Qr(vcCredentialResponse);
-            if(!claim169Qr.isEmpty()) {
-                qrCodeImage = constructQRCode(claim169Qr);
-            }
-            else {
-                qrCodeImage = constructQRCodeWithVCData(vcCredentialResponse);
-            }
+            return constructQRCodeWithAuthorizeRequest(vcCredentialResponse, dataShareUrl);
         }
-
-        // is sd-jwt and has disclosures
-        boolean isSdJwtWithDisclosures = CredentialFormat.VC_SD_JWT.getFormat().equals(vcCredentialResponse.getFormat()) && CollectionUtils.isNotEmpty(disclosures);
-
-        data.put("isMaskedOn", maskDisclosures);
-        data.put("isSdJwtWithDisclosures", isSdJwtWithDisclosures);
-        data.put("qrCodeImage", qrCodeImage);
-        data.put("credentialValidity", credentialValidity);
-        data.put("logoUrl", issuerDTO.getDisplay().stream().map(d -> d.getLogo().getUrl()).findFirst().orElse(""));
-        data.put("rowProperties", rowProperties);
-        data.put("disclosures", disclosuresProps);
-        data.put("textColor", textColor);
-        data.put("backgroundColor", backgroundColor);
-        data.put("backgroundImage", backgroundImage);
-        data.put("titleName", credentialSupportedType);
-        data.put("face", face);
-        return data;
+        if (QRCodeType.EmbeddedVC.equals(issuerDTO.getQr_code_type())) {
+            String claim169Qr = extractClaim169Qr(vcCredentialResponse);
+            return claim169Qr.isEmpty() ? constructQRCodeWithVCData(vcCredentialResponse) : constructQRCode(claim169Qr);
+        }
+        return "";
     }
 
     private String extractClaim169Qr(VCCredentialResponse vcCredentialResponse) {

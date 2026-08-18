@@ -62,6 +62,8 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
     private static final String ALG = "alg";
     private static final String CREDENTIAL_SUBJECT = "credentialSubject";
     private static final String SD = "_sd";
+    private static final String PUBLIC_CLAIMS = "publicClaims";
+    private static final String SD_CLAIMS = "sdClaims";
 
     private final ObjectMapper objectMapper;
 
@@ -484,13 +486,13 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
                 return Collections.emptyMap();
             }
             Map<String, Object> credentialClaimsMap = new HashMap<>();
-            mergeClaimProperties(credentialClaimsMap, extractedMap.get("publicClaims"));
+            mergeClaimProperties(credentialClaimsMap, extractedMap.get(PUBLIC_CLAIMS));
             Map<?, ?> sdClaimValues = asStringObjectMap(extractedMap.get("sdClaimValues"));
             if (sdClaimValues != null && !sdClaimValues.isEmpty()) {
                 mergeClaimProperties(credentialClaimsMap, sdClaimValues);
             } else {
                 // Fallback for legacy handler responses: existence checks only.
-                mergeClaimProperties(credentialClaimsMap, extractedMap.get("sdClaims"));
+                mergeClaimProperties(credentialClaimsMap, extractedMap.get(SD_CLAIMS));
             }
             return credentialClaimsMap;
         } else {
@@ -606,10 +608,11 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
 
         if (CredentialFormat.isSdJwt(format)) {
             CredentialFormatHandler credentialFormatHandler = credentialFormatHandlerFactory.getHandler(format);
-            Map<String, Map<String, Object>> allClaims = (Map<String, Map<String, Object>>) credentialFormatHandler.extractAllCredentialProperties(decryptedCredentialDTO.getCredential());
+            @SuppressWarnings("unchecked")
+            Map<String, Map<String, Object>> allClaims = (Map<String, Map<String, Object>>) (Map<?, ?>) credentialFormatHandler.extractAllCredentialProperties(decryptedCredentialDTO.getCredential());
 
-            Map<String, Object> publicClaimsMap = allClaims.get("publicClaims");
-            Map<String, Object> sdClaimsMap = allClaims.get("sdClaims");
+            Map<String, Object> publicClaimsMap = allClaims.get(PUBLIC_CLAIMS);
+            Map<String, Object> sdClaimsMap = allClaims.get(SD_CLAIMS);
 
             publicClaims = publicClaimsMap != null ? extractPublicClaimPaths(publicClaimsMap) : new ArrayList<>();
             sdClaims = sdClaimsMap != null ? extractSdClaimPaths(sdClaimsMap) : new ArrayList<>();
@@ -670,10 +673,11 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
 
         if (CredentialFormat.isSdJwt(format)) {
             CredentialFormatHandler credentialFormatHandler = credentialFormatHandlerFactory.getHandler(format);
-            Map<String, Map<String, Object>> allClaims = (Map<String, Map<String, Object>>) credentialFormatHandler.extractAllCredentialProperties(decryptedCredentialDTO.getCredential());
+            @SuppressWarnings("unchecked")
+            Map<String, Map<String, Object>> allClaims = (Map<String, Map<String, Object>>) (Map<?, ?>) credentialFormatHandler.extractAllCredentialProperties(decryptedCredentialDTO.getCredential());
 
-            Map<String, Object> publicClaimsMap = allClaims.get("publicClaims");
-            Map<String, Object> sdClaimsMap = allClaims.get("sdClaims");
+            Map<String, Object> publicClaimsMap = allClaims.get(PUBLIC_CLAIMS);
+            Map<String, Object> sdClaimsMap = allClaims.get(SD_CLAIMS);
 
             publicClaims = publicClaimsMap != null ? extractPublicClaimPaths(publicClaimsMap) : new ArrayList<>();
             sdClaims = sdClaimsMap != null ? extractDcqlFilteredSdClaimPaths(sdClaimsMap, matchedClaims) : new ArrayList<>();
@@ -749,7 +753,6 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
             String key = entry.getKey();
             Object value = entry.getValue();
 
-            // Skip _sd keys
             if (SD.equals(key)) {
                 continue;
             }
@@ -759,18 +762,20 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
             if (value instanceof Map) {
                 collectPaths((Map<String, Object>) value, currentPath, paths);
             } else if (value instanceof List<?> listValue) {
-                if (hasUniformKeys(listValue)) {
-                    paths.add(currentPath);
-                } else {
-                    paths.add(currentPath);
-                    for (Object item : listValue) {
-                        if (item instanceof Map<?, ?> mapItem) {
-                            collectPaths((Map<String, Object>) mapItem, currentPath, paths);
-                        }
-                    }
-                }
+                collectPathsFromList(listValue, currentPath, paths);
             } else {
                 paths.add(currentPath);
+            }
+        }
+    }
+
+    private void collectPathsFromList(List<?> listValue, String currentPath, List<String> paths) {
+        paths.add(currentPath);
+        if (!hasUniformKeys(listValue)) {
+            for (Object item : listValue) {
+                if (item instanceof Map<?, ?> mapItem) {
+                    collectPaths((Map<String, Object>) mapItem, currentPath, paths);
+                }
             }
         }
     }

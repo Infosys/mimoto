@@ -40,6 +40,9 @@ import static io.mosip.openID4VP.authorizationRequest.WalletConfigDefaultsKt.get
 @Slf4j
 public class OpenID4VPService {
 
+    private static final String ES256 = "ES256";
+    private static final String ED_DSA = "EdDSA";
+
     private final VerifierService verifierService;
 
     public OpenID4VPService(VerifierService verifierService) {
@@ -53,8 +56,8 @@ public class OpenID4VPService {
     private WalletConfig buildWalletConfig(List<Verifier> trustedVerifiers, boolean validateTrustedVerifier) {
         Map<VPFormatType, VPFormatSupported> vpFormatsSupported = Map.of(
                 VPFormatType.LDP_VC, new LdpVpFormatSupported(List.of(ProofType.Ed25519Signature2020), null),
-                VPFormatType.VC_SD_JWT, new SdJwtVpFormatSupported(List.of("ES256", "EdDSA"), List.of("ES256", "EdDSA")),
-                VPFormatType.DC_SD_JWT, new SdJwtVpFormatSupported(List.of("ES256", "EdDSA"), List.of("ES256", "EdDSA")),
+                VPFormatType.VC_SD_JWT, new SdJwtVpFormatSupported(List.of(ES256, ED_DSA), List.of(ES256, ED_DSA)),
+                VPFormatType.DC_SD_JWT, new SdJwtVpFormatSupported(List.of(ES256, ED_DSA), List.of(ES256, ED_DSA)),
                 VPFormatType.MSO_MDOC, new MsoMdocVpFormatSupported(List.of(-7), List.of(-7))
         );
 

@@ -112,7 +112,7 @@ public class TokenAuthController {
             }
     )
     @PostMapping("/auth/{provider}/token-login")
-    public ResponseEntity<?> createSessionFromIdToken(@RequestHeader(value = "Authorization", required = false) String authorization, @PathVariable("provider") String provider, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Object> createSessionFromIdToken(@RequestHeader(value = "Authorization", required = false) String authorization, @PathVariable("provider") String provider, HttpServletRequest request, HttpServletResponse response) {
         if (authorization == null || !authorization.startsWith(BEARER_PREFIX)) {
             return Utilities.buildErrorResponse(HttpStatus.BAD_REQUEST, ErrorConstants.INVALID_REQUEST.getErrorCode(), INVALID_TOKEN_MESSAGE);
         }
@@ -123,7 +123,7 @@ public class TokenAuthController {
             tokenService.processToken(idToken, provider, request, response);
             return ResponseEntity.ok(SESSION_CREATED);
         } catch (OAuth2AuthenticationException e) {
-            return Utilities.getErrorResponseEntityWithoutWrapper(e, e.getErrorCode(), HttpStatus.UNAUTHORIZED, MediaType.APPLICATION_JSON);
+            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(e, e.getErrorCode(), HttpStatus.UNAUTHORIZED, MediaType.APPLICATION_JSON);
         }
     }
 }

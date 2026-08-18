@@ -13,6 +13,7 @@ import io.mosip.mimoto.util.TestUtilities;
 import io.mosip.mimoto.util.Utilities;
 import io.mosip.openID4VP.authorizationRequest.Verifier;
 import org.junit.Before;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -51,6 +52,7 @@ public class VerifierServiceTest {
 
     @Before
     public void setUp() throws JsonProcessingException {
+        ReflectionTestUtils.setField(verifiersService, "self", verifiersService);
         VerifiersDTO verifiersDTO = TestUtilities.getTrustedVerifiers();
         String verifiersListString = TestUtilities.getObjectAsString(verifiersDTO);
         when(utilities.getTrustedVerifiersJsonValue()).thenReturn(verifiersListString);
