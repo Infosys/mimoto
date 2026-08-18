@@ -3213,7 +3213,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Error"
+                                    "$ref": "#/components/schemas/ErrorDTO"
                                 },
                                 "examples": {
                                     "Invalid Wallet ID": {
@@ -3255,7 +3255,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Error"
+                                    "$ref": "#/components/schemas/ErrorDTO"
                                 },
                                 "examples": {
                                     "User ID is not present in session": {
@@ -3279,7 +3279,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Error"
+                                    "$ref": "#/components/schemas/ErrorDTO"
                                 },
                                 "examples": {
                                     "Failed to process presentation submission": {
@@ -7467,6 +7467,32 @@
                     }
                 },
                 "description": "Generic API response wrapper containing the successful response payload or a list of errors."
+            },
+            "SubmitPresentationResponseDTO": {
+                "required": [
+                    "status",
+                    "message"
+                ],
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "description": "Outcome of the presentation submission workflow, such as success when credentials were sent or error when the request was rejected.",
+                        "enum": ["SUCCESS", "ERROR"],
+                        "example": "SUCCESS"
+                    },
+                    "redirectUri": {
+                        "type": "string",
+                        "description": "Verifier callback URI to which the wallet or client should redirect after the presentation flow is completed.",
+                        "example": "https://verifier.example/callback"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Human-readable summary explaining whether the presentation was submitted successfully or rejected by the user.",
+                        "example": "Request processed successfully."
+                    }
+                },
+                "description": "Response returned after a presentation is submitted or rejected, including the processing status, message, and verifier redirect URI when available."
             }
         },
         "securitySchemes": {
@@ -7475,6 +7501,12 @@
                 "description": "Session-based authentication using a session ID stored in the cookie. The client must send the 'SESSION' cookie (e.g., SESSION=<session-id>) with each request.",
                 "name": "SESSION",
                 "in": "cookie"
+            },
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Bearer token authentication using an ID token issued by the configured identity provider."
             }
         }
     }
