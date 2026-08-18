@@ -205,7 +205,7 @@ public class WalletPresentationsController {
     @ApiResponse(responseCode = "401", description = "Unauthorized user", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class), examples = @ExampleObject(name = SwaggerLiteralConstants.WALLET_PRESENTATIONS_HANDLE_ACTION_401_UNAUTHORIZED_NAME, value = SwaggerLiteralConstants.WALLET_PRESENTATIONS_HANDLE_ACTION_401_UNAUTHORIZED_VALUE)))
     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class), examples = @ExampleObject(name = SwaggerLiteralConstants.WALLET_PRESENTATIONS_HANDLE_ACTION_500_SERVER_ERROR_NAME, value = SwaggerLiteralConstants.WALLET_PRESENTATIONS_HANDLE_ACTION_500_SERVER_ERROR_VALUE)))
     @PatchMapping("/{presentationId}")
-    public ResponseEntity<?> handlePresentationAction(@PathVariable("walletId") String walletId, HttpSession httpSession, @PathVariable("presentationId") String presentationId, @Valid @RequestBody SubmitPresentationRequestDTO request) {
+    public ResponseEntity<Object> handlePresentationAction(@PathVariable("walletId") String walletId, HttpSession httpSession, @PathVariable("presentationId") String presentationId, @Valid @RequestBody SubmitPresentationRequestDTO request) {
 
         try {
             WalletUtil.validateWalletId(httpSession, walletId);
@@ -214,20 +214,20 @@ public class WalletPresentationsController {
 
             if (vpSessionData == null) {
                 log.error("No presentation session data found in session for presentationId: {}", presentationId);
-                return Utilities.getErrorResponseEntityWithoutWrapper(new InvalidRequestException(INVALID_REQUEST.getErrorCode(), "presentationId not found in session"), INVALID_REQUEST.getErrorCode(), HttpStatus.BAD_REQUEST, MediaType.APPLICATION_JSON);
+                return Utilities.<Object>getErrorResponseEntityWithoutWrapper(new InvalidRequestException(INVALID_REQUEST.getErrorCode(), "presentationId not found in session"), INVALID_REQUEST.getErrorCode(), HttpStatus.BAD_REQUEST, MediaType.APPLICATION_JSON);
             }
 
             String base64Key = (String) httpSession.getAttribute(SessionKeys.WALLET_KEY);
             if (base64Key == null) {
                 log.warn("Wallet key not found in session for walletId: {}", walletId);
-                return Utilities.getErrorResponseEntityFromPlatformErrorMessage(UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED, MediaType.APPLICATION_JSON);
+                return Utilities.<Object>getErrorResponseEntityFromPlatformErrorMessage(UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED, MediaType.APPLICATION_JSON);
             }
 
             return walletPresentationService.handlePresentationAction(walletId, presentationId, request, vpSessionData, base64Key);
 
         }
         catch (IllegalArgumentException exception){
-            return Utilities.getErrorResponseEntityWithoutWrapper(exception, INVALID_REQUEST.getErrorCode(), HttpStatus.BAD_REQUEST, MediaType.APPLICATION_JSON);
+            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(exception, INVALID_REQUEST.getErrorCode(), HttpStatus.BAD_REQUEST, MediaType.APPLICATION_JSON);
         }
     }
 }

@@ -435,9 +435,9 @@ public class CredentialShareServiceImpl implements CredentialShareService {
                 JSONObject objects = getJSONObjectFromArray(demographicJsonNode, i);
                 if (objects != null) {
                     language = (String) objects.get("language");
-                    value = (String) objects.get("value");
+                    value = (String) objects.get(VALUE);
                     FieldUtils.writeField(jsonNodeElement, "language", language, true);
-                    FieldUtils.writeField(jsonNodeElement, "value", value, true);
+                    FieldUtils.writeField(jsonNodeElement, VALUE, value, true);
                     javaObject[i] = jsonNodeElement;
                 }
             }

@@ -308,25 +308,7 @@ public class PresentationServiceImpl implements PresentationService {
         } else if (CredentialFormat.VC_SD_JWT.getFormat().equalsIgnoreCase(vcFormat)
                 || CredentialFormat.DC_SD_JWT.getFormat().equalsIgnoreCase(vcFormat)) {
             Map<String, Object> jwtPayload = extractJwtPayloadFromSdJwt((String) vcRes.getCredential());
-            Object vct = jwtPayload.get("vct");
-            if (vct != null) {
-                meta.put("vct_values", List.of(vct.toString()));
-            } else {
-                List<?> typeList = (List<?>) jwtPayload.get("type");
-                String lastType = null;
-                if (typeList != null && !typeList.isEmpty()) {
-                    Object lastItem = typeList.get(typeList.size() - 1);
-                    if (lastItem instanceof Map) {
-                        Object value = ((Map<?, ?>) lastItem).get("_value");
-                        lastType = value != null ? value.toString() : null;
-                    } else {
-                        lastType = lastItem.toString();
-                    }
-                }
-                if (lastType != null) {
-                    meta.put("vct_values", List.of(lastType));
-                }
-            }
+            buildSdJwtMetaFromPayload(jwtPayload, meta);
         }
         if (!meta.isEmpty()) {
             credentialQuery.put("meta", meta);
@@ -335,6 +317,30 @@ public class PresentationServiceImpl implements PresentationService {
         Map<String, Object> dcqlQuery = new LinkedHashMap<>();
         dcqlQuery.put("credentials", List.of(credentialQuery));
         return dcqlQuery;
+    }
+
+    private void buildSdJwtMetaFromPayload(Map<String, Object> jwtPayload, Map<String, Object> meta) {
+        Object vct = jwtPayload.get("vct");
+        if (vct != null) {
+            meta.put("vct_values", List.of(vct.toString()));
+        } else {
+            String lastType = resolveLastTypeFromList((List<?>) jwtPayload.get("type"));
+            if (lastType != null) {
+                meta.put("vct_values", List.of(lastType));
+            }
+        }
+    }
+
+    private String resolveLastTypeFromList(List<?> typeList) {
+        if (typeList == null || typeList.isEmpty()) {
+            return null;
+        }
+        Object lastItem = typeList.get(typeList.size() - 1);
+        if (lastItem instanceof Map) {
+            Object value = ((Map<?, ?>) lastItem).get("_value");
+            return value != null ? value.toString() : null;
+        }
+        return lastItem.toString();
     }
 
     private String processInputDescriptor(VCCredentialResponse vcCredentialResponse, InputDescriptorDTO inputDescriptorDTO,

@@ -218,7 +218,7 @@ public class Utilities {
         }
         return new String[]{errorCode, errorMessage};
     }
-    public static <T> ResponseEntity<ResponseWrapper<T>> handleErrorResponse(
+    public static ResponseEntity<Object> handleErrorResponse(
             Exception exception, String flowErrorCode, HttpStatus status, MediaType contentType) {
         String errorMessage = exception.getMessage();
         String errorCode = flowErrorCode;
@@ -229,7 +229,7 @@ public class Utilities {
             errorMessage = errorSections[1];
         }
 
-        ResponseWrapper<T> responseWrapper = new ResponseWrapper<>();
+        ResponseWrapper<Object> responseWrapper = new ResponseWrapper<>();
         responseWrapper.setResponse(null);
         responseWrapper.setErrors(Utilities.getErrors(errorCode, errorMessage));
         ResponseEntity.BodyBuilder responseEntity = ResponseEntity.status(status);
@@ -269,7 +269,7 @@ public class Utilities {
         return (ResponseEntity<T>) responseEntity.body(new ErrorDTO(errorCode, errorMessage));
     }
 
-    public static ResponseEntity<ErrorDTO> buildErrorResponse(HttpStatus status, String errorCode, String message) {
+    public static ResponseEntity<Object> buildErrorResponse(HttpStatus status, String errorCode, String message) {
         return ResponseEntity
                 .status(status)
                 .contentType(MediaType.APPLICATION_JSON)

@@ -286,7 +286,7 @@ public class WalletCredentialsController {
             @ApiResponse(responseCode = "404", description = "Credential not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = {@Content(mediaType = "application/json")})})
     @DeleteMapping("/{credentialId}")
-    public ResponseEntity<?> deleteCredential(@PathVariable("walletId") String walletId,
+    public ResponseEntity<Object> deleteCredential(@PathVariable("walletId") String walletId,
                                               @PathVariable("credentialId") String credentialId,
                                               HttpSession httpSession) {
         try {
@@ -296,17 +296,17 @@ public class WalletCredentialsController {
 
             // Delete the credential
             walletCredentialService.deleteCredential(credentialId, walletId);
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.OK).<Object>build();
         } catch (InvalidRequestException exception) {
             log.error("Invalid request: {}", exception.getMessage());
-            return Utilities.getErrorResponseEntityWithoutWrapper(
+            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(
                     exception,
                     exception.getErrorCode(),
                     HttpStatus.BAD_REQUEST,
                     MediaType.APPLICATION_JSON);
         } catch (CredentialNotFoundException exception) {
             log.error("Credential not found: {}", exception.getMessage());
-            return Utilities.getErrorResponseEntityWithoutWrapper(
+            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(
                     exception,
                     exception.getErrorCode(),
                     HttpStatus.NOT_FOUND,
