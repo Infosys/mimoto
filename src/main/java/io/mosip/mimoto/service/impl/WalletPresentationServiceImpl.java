@@ -615,21 +615,14 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
             byte[] dataToSign = token.getDataToSign();
             Base64URL signature;
             try {
-                if (token.getFormat() == FormatType.LDP_VC) {
-                    // LDP_VC: sign payload bytes after the first '.' separator
-                    int dotIndex = indexOfDot(dataToSign);
-                    String headerB64 = new String(dataToSign, 0, dotIndex, StandardCharsets.US_ASCII);
-                    byte[] payload = Arrays.copyOfRange(dataToSign, dotIndex + 1, dataToSign.length);
-                    JWSHeader header = JWSHeader.parse(new Base64URL(headerB64));
-                    signature = signer.sign(header, payload);
-                } else if (token.getFormat() == FormatType.MSO_MDOC) {
-                    // mso_mdoc: dataToSign is raw CBOR DeviceAuthentication bytes; sign directly with COSE ES256
+                if (token.getFormat() == FormatType.MSO_MDOC) {
+                    // mso_mdoc: dataToSign is raw CBOR DeviceAuthentication bytes; signing algorithm is provided by the library via UnsignedVPToken
                     JWSHeader header = new JWSHeader(algorithm.getJWSAlgorithm());
                     signature = signer.sign(header, dataToSign);
                 } else {
-                    // SD-JWT: standard JWT signing input is ASCII bytes of "headerB64.payloadB64"
-                    String unsignedJwt = new String(dataToSign, StandardCharsets.US_ASCII);
-                    String headerB64 = unsignedJwt.substring(0, unsignedJwt.indexOf('.'));
+                    // ldp_vc and sd_jwt: parse JWS header from the first segment, sign full dataToSign
+                    int dotIndex = indexOfDot(dataToSign);
+                    String headerB64 = new String(dataToSign, 0, dotIndex, StandardCharsets.US_ASCII);
                     JWSHeader header = JWSHeader.parse(new Base64URL(headerB64));
                     signature = signer.sign(header, dataToSign);
                 }
