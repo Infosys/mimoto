@@ -16,6 +16,7 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.nimbusds.jose.util.Base64URL;
 import io.mosip.injivcrenderer.InjiVcRenderer;
 import io.mosip.mimoto.constant.CredentialFormat;
+import io.mosip.mimoto.exception.CredentialPdfGenerationException;
 import io.mosip.mimoto.constant.LdpVcV1Constants;
 import io.mosip.mimoto.constant.LdpVcV2Constants;
 import io.mosip.mimoto.constant.SdJwtVcConstants;
@@ -99,7 +100,7 @@ public class CredentialPDFGeneratorService {
 
     private static final String CLAIM_169_KEY = "claim169";
     
-    public ByteArrayInputStream generatePdfForVerifiableCredential(String credentialConfigurationId, VCCredentialResponse vcCredentialResponse, IssuerDTO issuerDTO, CredentialsSupportedResponse credentialsSupportedResponse, String dataShareUrl, String credentialValidity, String locale) throws Exception {
+    public ByteArrayInputStream generatePdfForVerifiableCredential(String credentialConfigurationId, VCCredentialResponse vcCredentialResponse, IssuerDTO issuerDTO, CredentialsSupportedResponse credentialsSupportedResponse, String dataShareUrl, String credentialValidity, String locale) throws IOException, WriterException {
         // Check if the credential can support SVG based rendering
         if (isSvgBasedRenderingSupported(vcCredentialResponse)) {
             log.info("Detected LDP VC v2 credential with svg template, using InjiVcRenderer for PDF generation");
@@ -406,7 +407,7 @@ public class CredentialPDFGeneratorService {
         return false;
     }
 
-    private ByteArrayInputStream generatePdfUsingSvgTemplate(VCCredentialResponse vcCredentialResponse, IssuerDTO issuerDTO, String dataShareUrl) throws Exception {
+    private ByteArrayInputStream generatePdfUsingSvgTemplate(VCCredentialResponse vcCredentialResponse, IssuerDTO issuerDTO, String dataShareUrl) {
         try {
             // Get the ldp_vc credential and convert to string
             String credentialJsonString = objectMapper.writeValueAsString(vcCredentialResponse.getCredential());
@@ -427,7 +428,7 @@ public class CredentialPDFGeneratorService {
                     io.mosip.injivcrenderer.constants.CredentialFormat.LDP_VC, null, credentialJsonString, qrCodeData);
 
             if (generatedSvgObjects.isEmpty()) {
-                 throw new Exception("No SVG content generated for v2 credential");
+                throw new CredentialPdfGenerationException("PDF_GEN_001", "No SVG content generated for v2 credential");
             }
 
             List<String> svgStrings = generatedSvgObjects.stream()
@@ -442,7 +443,7 @@ public class CredentialPDFGeneratorService {
             return new ByteArrayInputStream(decodedPdfBytes);
         } catch (Exception e) {
             log.error("Error generating PDF for v2 credential using InjiVcRenderer: {}", e.getMessage(), e);
-            throw new Exception("Failed to generate PDF for v2 credential: " + e.getMessage(), e);
+            throw new CredentialPdfGenerationException("PDF_GEN_002", "Failed to generate PDF for v2 credential: " + e.getMessage(), e);
         }
     }
 }

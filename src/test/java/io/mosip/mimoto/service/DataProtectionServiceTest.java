@@ -174,19 +174,21 @@ public class DataProtectionServiceTest {
 
 
     @Test
-    public void shouldReturnNullIfDataToDecryptWithAESIsNull() {
+    public void shouldReturnEmptyArrayIfDataToDecryptWithAESIsNull() {
         SecretKey key = encryptionKey;
         String data = null;
         byte[] result = dataProtectionService.decryptWithAES(key, data);
-        assertNull(result);
+        assertNotNull(result);
+        assertEquals(0, result.length);
     }
 
     @Test
-    public void shouldReturnNullIfDataToDecryptWithAESEmpty() {
+    public void shouldReturnEmptyArrayIfDataToDecryptWithAESEmpty() {
         SecretKey key = encryptionKey;
         String data = "";
         byte[] result = dataProtectionService.decryptWithAES(key, data);
-        assertNull(result);
+        assertNotNull(result);
+        assertEquals(0, result.length);
     }
 
     @Test(expected = RuntimeException.class)
@@ -333,11 +335,12 @@ public class DataProtectionServiceTest {
 
 
     @Test
-    public void shouldReturnNullWhenStringToBytesInputIsNull() throws Exception {
-        // Use reflection to access private static method
+    public void shouldReturnEmptyArrayWhenStringToBytesInputIsNull() throws Exception {
         java.lang.reflect.Method method = DataProtectionService.class.getDeclaredMethod("stringToBytes", String.class);
         method.setAccessible(true);
-        assertNull(method.invoke(null, (Object) null));
+        byte[] result = (byte[]) method.invoke(null, (Object) null);
+        assertNotNull(result);
+        assertEquals(0, result.length);
     }
 
     @Test

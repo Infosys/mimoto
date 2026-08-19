@@ -95,7 +95,7 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
         if (sessionData.isDcql()) {
             return matchWithDcqlQuery(sessionData, walletId, decryptedCredentials);
         }
-        return matchWithPresentationDefinition(sessionData, walletId, base64Key, decryptedCredentials);
+        return matchWithPresentationDefinition(sessionData, base64Key, decryptedCredentials);
     }
 
     private void validateMatchingCredentialsRequest(VerifiablePresentationSessionData sessionData, String walletId) {
@@ -111,7 +111,6 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
 
     private MatchingCredentialsDTO matchWithPresentationDefinition(
             VerifiablePresentationSessionData sessionData,
-            String walletId,
             String base64Key,
             List<DecryptedCredentialDTO> decryptedCredentials) throws ApiNotAccessibleException, IOException {
 
@@ -139,11 +138,11 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
                     InputDescriptor descriptor = descriptors.get(i);
                     List<DecryptedCredentialDTO> descriptorMatches = decryptedCredentials.stream()
                             .filter(decrypted -> matchesInputDescriptor(decrypted.getCredential(), descriptor))
-                            .collect(Collectors.toList());
+                            .toList();
 
                     List<CredentialDTO> matches = descriptorMatches.stream()
                             .map(this::buildAvailableCredential)
-                            .collect(Collectors.toList());
+                            .toList();
 
                     if (!matches.isEmpty()) {
                         descriptorMatches.forEach(dto -> credentialToInputDescriptor.put(dto.getId(), descriptor.getId()));
@@ -164,7 +163,7 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
         List<CredentialDTO> availableCredentials = matchingCredentialsByDescriptor.values().stream()
                 .flatMap(List::stream)
                 .filter(credential -> addedCredentialIds.add(credential.getCredentialId()))
-                .collect(Collectors.toList());
+                .toList();
 
         MatchingCredentialsResponseDTO matchingCredentialsResponse = MatchingCredentialsResponseDTO.builder()
                 .availableCredentials(availableCredentials)
@@ -177,8 +176,8 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
 
         List<DecryptedCredentialDTO> matchingCredentials = decryptedCredentials.stream()
                 .filter(credential -> matchedCredentialIds.contains(credential.getId()))
-                .peek(credential -> credential.setIdentifier(credentialToInputDescriptor.get(credential.getId())))
-                .collect(Collectors.toList());
+                .toList();
+        matchingCredentials.forEach(credential -> credential.setIdentifier(credentialToInputDescriptor.get(credential.getId())));
 
         return MatchingCredentialsDTO.builder()
                 .matchingCredentialsResponse(matchingCredentialsResponse)
@@ -237,7 +236,7 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
                     .map(match -> buildAvailableCredential(
                             match,
                             matchedClaimsByCredId.getOrDefault(match.getId(), Collections.emptyList())))
-                    .collect(Collectors.toList());
+                    .toList();
 
             queryGroups.add(DcqlQueryGroup.builder()
                     .queryId(credentialQuery.getId())
@@ -250,7 +249,7 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
         List<CredentialSetInfo> credentialSets = DcqlCredentialSetHelper.resolveEffectiveCredentialSets(dcqlQuery)
                 .stream()
                 .map(this::toCredentialSetInfo)
-                .collect(Collectors.toList());
+                .toList();
 
         log.info("matchWithDcqlQuery: walletId={}, queries={}, credentialSets={}, totalMatched={}, dcqlSuccess={}",
                 walletId, queryGroups.size(), credentialSets.size(), matchedById.size(), evaluationResult.getSuccess());
@@ -367,9 +366,9 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
                 .filter(claim -> !claim.isBlank());
 
         if (deduplicate) {
-            return claimsStream.distinct().collect(Collectors.toList());
+            return claimsStream.distinct().toList();
         } else {
-            return claimsStream.collect(Collectors.toList());
+            return claimsStream.toList();
         }
     }
 
@@ -488,8 +487,8 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
             }
             Map<String, Object> credentialClaimsMap = new HashMap<>();
             mergeClaimProperties(credentialClaimsMap, extractedMap.get(PUBLIC_CLAIMS));
-            Map<?, ?> sdClaimValues = asStringObjectMap(extractedMap.get("sdClaimValues"));
-            if (sdClaimValues != null && !sdClaimValues.isEmpty()) {
+            Map<String, Object> sdClaimValues = asStringObjectMap(extractedMap.get("sdClaimValues"));
+            if (!sdClaimValues.isEmpty()) {
                 mergeClaimProperties(credentialClaimsMap, sdClaimValues);
             } else {
                 // Fallback for legacy handler responses: existence checks only.
@@ -502,16 +501,13 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
     }
 
     private void mergeClaimProperties(Map<String, Object> target, Object section) {
-        Map<String, Object> properties = asStringObjectMap(section);
-        if (properties != null) {
-            target.putAll(properties);
-        }
+        target.putAll(asStringObjectMap(section));
     }
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> asStringObjectMap(Object section) {
         if (!(section instanceof Map<?, ?> rawMap)) {
-            return null;
+            return Collections.emptyMap();
         }
         Map<String, Object> properties = new LinkedHashMap<>();
         for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
@@ -562,16 +558,6 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
             log.debug("Path not found in JSON: {}", path);
             return Collections.emptyList();
         }
-    }
-
-    private List<String> extractRequiredClaims(PresentationDefinition presentationDefinition) {
-
-        List<Fields> allFields = presentationDefinition.getInputDescriptors().stream()
-                .filter(id -> id.getConstraints().getFields() != null)
-                .flatMap(id -> id.getConstraints().getFields().stream())
-                .collect(Collectors.toList());
-
-        return extractClaimsFromFields(allFields, true);
     }
 
     private String extractClaimKeyFromPath(String path) {
@@ -639,9 +625,7 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
         }
         Map<String, List<ClaimsQuery>> index = new LinkedHashMap<>();
         for (MatchingCredential mc : queryMatch.getMatchingCredentials()) {
-            if (mc.getCredentialId() != null) {
-                index.putIfAbsent(mc.getCredentialId(), mc.getMatchingClaims());
-            }
+            index.putIfAbsent(mc.getCredentialId(), mc.getMatchingClaims());
         }
         return index;
     }
