@@ -35,11 +35,4 @@ public class CredentialRequestResponseDTO {
     @Schema(description = "List of errors returned by the resident service when the credential request could not be completed.")
     private List<ErrorDTO> errors = new ArrayList<>();
 
-    public CredentialRequestResponseInnerResponseDTO getResponse() {
-        return response;
-    }
-
-    public List<ErrorDTO> getErrors() {
-        return errors;
-    }
 }

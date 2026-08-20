@@ -19,11 +19,4 @@ public class CredentialDownloadResponseDTO {
             example = "{\"@context\": [...], \"type\": [...]}")
     private JsonNode verifiableCredential;
 
-    public void setCredential(JsonNode credential) {
-        this.credential = credential;
-    }
-
-    public void setVerifiableCredential(JsonNode verifiableCredential) {
-        this.verifiableCredential = verifiableCredential;
-    }
 }

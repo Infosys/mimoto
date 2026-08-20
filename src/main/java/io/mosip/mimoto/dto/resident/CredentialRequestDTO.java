@@ -43,31 +43,4 @@ public class CredentialRequestDTO {
     @Schema(description = "List of credential attributes that may be shared in the issued credential.")
     private List<String> sharableAttributes;
 
-    public void setIndividualId(String individualId) {
-        this.individualId = individualId;
-    }
-
-    public void setOtp(String otp) {
-        this.otp = otp;
-    }
-
-    public void setTransactionID(String transactionID) {
-        this.transactionID = transactionID;
-    }
-
-    public void setCredentialType(String credentialType) {
-        this.credentialType = credentialType;
-    }
-
-    public void setEncryptionKey(String encryptionKey) {
-        this.encryptionKey = encryptionKey;
-    }
-
-    public void setIssuer(String issuer) {
-        this.issuer = issuer;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
 }

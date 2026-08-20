@@ -19,11 +19,4 @@ public class GenericResponseDTO {
             example = "Request processed successfully.")
     private String message;
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

@@ -12,7 +12,4 @@ public class CredentialRequestResponseInnerResponseDTO {
     @Schema(description = "Credential request identifier that can be used later to poll status or download data.")
     private String requestId;
 
-    public String getRequestId() {
-        return requestId;
-    }
 }

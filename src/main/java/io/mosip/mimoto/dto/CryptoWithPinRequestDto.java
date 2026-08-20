@@ -45,19 +45,4 @@ public class CryptoWithPinRequestDto {
     @NotBlank
     private String userPin;
 
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    public void setUserPin(String userPin) {
-        this.userPin = userPin;
-    }
-
-    public String getUserPin() {
-        return userPin;
-    }
 }

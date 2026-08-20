@@ -19,7 +19,4 @@ public class BackgroundImageDTO {
     @Schema(description = "URI of the background image asset.")
     String uri;
 
-    public String getUri() {
-        return uri;
-    }
 }

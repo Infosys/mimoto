@@ -41,7 +41,4 @@ public class VCCredentialResponseProof implements Serializable {
     @Schema(description = "Detached proof value when present.")
     private String proofValue;
 
-    public String getType() {
-        return type;
-    }
 }

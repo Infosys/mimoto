@@ -28,43 +28,4 @@ public class RequestWrapper<T> {
     @Schema(description = "Actual business request payload carried inside the wrapper.")
     private T request;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getRequesttime() {
-        return requesttime;
-    }
-
-    public void setRequesttime(String requesttime) {
-        this.requesttime = requesttime;
-    }
-
-    public Object getMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(Object metadata) {
-        this.metadata = metadata;
-    }
-
-    public T getRequest() {
-        return request;
-    }
-
-    public void setRequest(T request) {
-        this.request = request;
-    }
 }

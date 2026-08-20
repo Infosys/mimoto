@@ -59,7 +59,4 @@ public class Event {
         return dataShareUri;
     }
 
-    public Map<String, Object> getData() {
-        return data;
-    }
 }

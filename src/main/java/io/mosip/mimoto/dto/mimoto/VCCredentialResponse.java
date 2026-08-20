@@ -28,11 +28,4 @@ public class VCCredentialResponse implements Serializable {
     @Schema(description = "Issued credential payload in issuer-specific serialized form.")
     private Object credential;
 
-    public String getFormat() {
-        return format;
-    }
-
-    public Object getCredential() {
-        return credential;
-    }
 }

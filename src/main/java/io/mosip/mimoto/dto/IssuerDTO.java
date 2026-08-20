@@ -66,15 +66,4 @@ public class IssuerDTO {
     @Schema(description = "Credential Issuer Host")
     String credential_issuer_host;
 
-    public String getIssuer_id() {
-        return issuer_id;
-    }
-
-    public List<DisplayDTO> getDisplay() {
-        return display;
-    }
-
-    public QRCodeType getQr_code_type() {
-        return qr_code_type;
-    }
 }

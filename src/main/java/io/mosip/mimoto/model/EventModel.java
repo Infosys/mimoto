@@ -30,11 +30,4 @@ public class EventModel {
     @Schema(description = "Event payload delivered through the callback.")
     private Event event;
 
-    public Event getEvent() {
-        return event;
-    }
-
-    public void setEvent(Event event) {
-        this.event = event;
-    }
 }

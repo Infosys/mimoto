@@ -290,7 +290,4 @@ public class Utilities {
         return "X".repeat(Math.min(value.length(), 20));
     }
 
-    public String getDataPath() {
-        return dataPath;
-    }
 }

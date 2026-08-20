@@ -23,11 +23,4 @@ public class DataShareResponseDto extends BaseRestResponseDTO {
     @Schema(description = "List of errors returned when data share creation fails.")
     private List<ErrorDTO> errors;
 
-    public DataShare getDataShare() {
-        return dataShare;
-    }
-
-    public List<ErrorDTO> getErrors() {
-        return errors;
-    }
 }

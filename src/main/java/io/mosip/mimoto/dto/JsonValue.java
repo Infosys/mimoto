@@ -19,7 +19,4 @@ public class JsonValue {
     @Schema(description = "Localized value for the specified language.")
     private String value;
 
-    public String getLanguage() {
-        return language;
-    }
 }

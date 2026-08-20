@@ -36,27 +36,4 @@ public class AppCredentialRequestDTO {
             example = "user123")
     private String user;
 
-    public String getIndividualId() {
-        return individualId;
-    }
-
-    public String getOtp() {
-        return otp;
-    }
-
-    public String getTransactionID() {
-        return transactionID;
-    }
-
-    public String getIssuer() {
-        return issuer;
-    }
-
-    public String getCredentialType() {
-        return credentialType;
-    }
-
-    public String getUser() {
-        return user;
-    }
 }

@@ -55,11 +55,4 @@ public class VCCredentialProperties implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Object renderMethod;
 
-    public VCCredentialResponseProof getProof() {
-        return proof;
-    }
-
-    public List<String> getType() {
-        return type;
-    }
 }

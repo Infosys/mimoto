@@ -21,11 +21,4 @@ public class CredentialIssuerDisplayResponse {
     @Schema(description = "Locale of the Credential Issuer")
     private String locale;
 
-    public String getName() {
-        return name;
-    }
-
-    public String getLocale() {
-        return locale;
-    }
 }

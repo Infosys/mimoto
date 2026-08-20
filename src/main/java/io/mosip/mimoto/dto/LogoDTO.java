@@ -24,7 +24,4 @@ public class LogoDTO {
     @Schema(description = "Display logo alt text of the Issuer")
     String alt_text;
 
-    public String getUrl() {
-        return url;
-    }
 }

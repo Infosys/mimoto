@@ -23,19 +23,4 @@ public class ResponseWrapper<T> {
     @Schema(description = "List of errors returned when the API could not process the request successfully.")
     private List<ErrorDTO> errors = new ArrayList<>();
 
-    public T getResponse() {
-        return response;
-    }
-
-    public void setResponse(T response) {
-        this.response = response;
-    }
-
-    public List<ErrorDTO> getErrors() {
-        return errors;
-    }
-
-    public void setErrors(List<ErrorDTO> errors) {
-        this.errors = errors;
-    }
 }

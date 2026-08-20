@@ -2,6 +2,7 @@ package io.mosip.mimoto.exception;
 
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import lombok.Setter;
  * @author Shashank Agrawal
  * @since 1.0
  */
+@AllArgsConstructor
 @NoArgsConstructor
 class InfoItem implements Serializable {
 
@@ -25,10 +27,5 @@ class InfoItem implements Serializable {
     @Getter
     @Setter
     public String errorText = null;
-
-    InfoItem(String errorCode, String errorText) {
-        this.errorCode = errorCode;
-        this.errorText = errorText;
-    }
 
 }

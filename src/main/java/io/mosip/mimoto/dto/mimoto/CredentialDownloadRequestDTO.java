@@ -18,11 +18,4 @@ public class CredentialDownloadRequestDTO {
             example = "req-12345-67890")
     private String requestId;
 
-    public String getIndividualId() {
-        return individualId;
-    }
-
-    public String getRequestId() {
-        return requestId;
-    }
 }
