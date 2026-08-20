@@ -18,59 +18,63 @@
     "tags": [
         {
             "name": "Users",
-            "description": "All the User Profile related endpoints"
+            "description": "User Profile related endpoints"
         },
         {
             "name": "Issuers V2",
-            "description": "V2 API for issuers with minimal responses"
+            "description": "V2 API for issuers with minimal and required attributes"
         },
         {
             "name": "OAuth2 ID Token Authentication",
-            "description": "All the OAuth2 ID Token Authentication related endpoints"
-        },
-        {
-            "name": "cryptomanager",
-            "description": "Operation related to Encryption and Decryption"
+            "description": "OAuth2 ID Token Authentication related endpoints"
         },
         {
             "name": "Wallet Credentials",
-            "description": "All the Wallet Credentials related endpoints"
+            "description": "Wallet Credentials related endpoints"
         },
         {
             "name": "Wallets",
-            "description": "All the Wallet related endpoints"
+            "description": "Wallet related endpoints"
         },
         {
             "name": "Presentation",
-            "description": "All the online sharing related endpoints"
+            "description": "Online sharing related endpoints"
         },
         {
-            "name": "Credentials download using OpenId4VCI",
-            "description": "All the credentials related endpoints"
+            "name": "Credentials download as guest user using OpenId4VCI",
+            "description": "Credentials related endpoints"
         },
         {
             "name": "Resident Service",
-            "description": "All the resident service related endpoints"
+            "description": "Resident service related endpoints"
         },
         {
             "name": "Inji Wallet Properties",
             "description": "All endpoints related to Inji Wallet properties"
         },
         {
-            "name": "Credential Share",
-            "description": "All the credential download endpoints"
+            "name": "Credential Download through event or datashare",
+            "description": "Credential download endpoints"
         },
         {
             "name": "Issuers",
-            "description": "All the issuers related endpoints"
+            "description": "Issuers related endpoints"
         },
         {
             "name": "Wallet Binding",
-            "description": "All the authorization related endpoints"
+            "description": "Authorization related endpoints"
         },
         {
             "name": "Verifiers",
-            "description": "All the verifiers related endpoints"
+            "description": "Verifiers related endpoints"
+        },
+        {
+            "name": "Wallet Trusted Verifiers",
+            "description": "Wallet trusted verifiers related endpoints"
+        },
+        {
+            "name": "Wallet Presentations",
+            "description": "Wallet presentations related endpoints"
         }
     ],
     "paths": {
@@ -553,7 +557,7 @@
         "/wallets/{walletId}/trusted-verifiers": {
             "post": {
                 "tags": [
-                    "wallet-trusted-verifiers-controller"
+                    "Wallet Trusted Verifiers"
                 ],
                 "summary": "Add a trusted verifier to a wallet",
                 "description": "Adds a trusted verifier for the specified wallet after validating the session and request. Requires an active session; the path walletId must match the wallet in session. Returns the created verifier details on success.",
@@ -709,7 +713,7 @@
         "/wallets/{walletId}/presentations": {
             "post": {
                 "tags": [
-                    "wallet-presentations-controller"
+                    "Wallet Presentations"
                 ],
                 "summary": "Processes Verifiable Presentation Authorization Request and provides details about the verifier and presentation.",
                 "description": "This API is secured using session-based authentication. Upon receiving a request, the session is first retrieved using the session ID extracted from the Cookie header to authenticate the user. Once authenticated, the API processes the received Verifiable Presentation Authorization Request from the Verifier for a specific wallet. It validates the session, verifies the authenticity of the request, and checks if the Verifier is pre-registered and trusted by the wallet. If all validations pass, the API returns a response containing the presentation details; otherwise, an appropriate error response is returned.",
@@ -1608,170 +1612,6 @@
                 }
             }
         },
-        "/jwtEncrypt": {
-            "post": {
-                "tags": [
-                    "cryptomanager"
-                ],
-                "summary": "JWE Data Encryption",
-                "description": "Performs JSON Web Encrypt for the given data",
-                "operationId": "jwtEncrypt",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/RequestWrapperJWTEncryptRequestDto"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "500": {
-                        "description": "Internal Server Error",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {}
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "423": {
-                        "description": "Locked",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "200": {
-                        "description": "Success or you may find errors in error array in response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ResponseWrapperJWTCipherResponseDto"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    }
-                }
-            }
-        },
-        "/jwtDecrypt": {
-            "post": {
-                "tags": [
-                    "cryptomanager"
-                ],
-                "summary": "JWE Data Decryption",
-                "description": "Performs JSON Web Decrypt for the given encrypted data",
-                "operationId": "jwtDecrypt",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/RequestWrapperJWTDecryptRequestDto"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "500": {
-                        "description": "Internal Server Error",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {}
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "423": {
-                        "description": "Locked",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "200": {
-                        "description": "Success or you may find errors in error array in response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ResponseWrapperJWTCipherResponseDto"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    }
-                }
-            }
-        },
         "/get-token/{issuer}": {
             "post": {
                 "tags": [
@@ -1865,420 +1705,10 @@
                 }
             }
         },
-        "/generateArgon2Hash": {
-            "post": {
-                "tags": [
-                    "cryptomanager"
-                ],
-                "summary": "Argon2 hash generation",
-                "description": "Performs Hash generation using Argon2 algorithm",
-                "operationId": "generateArgon2Hash",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/RequestWrapperArgon2GenerateHashRequestDto"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "500": {
-                        "description": "Internal Server Error",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {}
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "423": {
-                        "description": "Locked",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "200": {
-                        "description": "Success or you may find errors in error array in response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ResponseWrapperArgon2GenerateHashResponseDto"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    }
-                }
-            }
-        },
-        "/encrypt": {
-            "post": {
-                "tags": [
-                    "cryptomanager"
-                ],
-                "summary": "Encrypt the data",
-                "description": "Encrypt the data",
-                "operationId": "encrypt",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/RequestWrapperCryptomanagerRequestDto"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "500": {
-                        "description": "Internal Server Error",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {}
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "423": {
-                        "description": "Locked",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "200": {
-                        "description": "Success or you may find errors in error array in response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ResponseWrapperCryptomanagerResponseDto"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    }
-                }
-            }
-        },
-        "/encryptWithPin": {
-            "post": {
-                "tags": [
-                    "cryptomanager"
-                ],
-                "summary": "Encrypt the data with pin",
-                "description": "Encrypt the data with pin",
-                "operationId": "encryptWithPin",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/RequestWrapperCryptoWithPinRequestDto"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "500": {
-                        "description": "Internal Server Error",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {}
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "423": {
-                        "description": "Locked",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "200": {
-                        "description": "Success or you may find errors in error array in response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ResponseWrapperCryptoWithPinResponseDto"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    }
-                }
-            }
-        },
-        "/decrypt": {
-            "post": {
-                "tags": [
-                    "cryptomanager"
-                ],
-                "summary": "Decrypt the data",
-                "description": "Decrypt the data",
-                "operationId": "decrypt",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/RequestWrapperCryptomanagerRequestDto"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "500": {
-                        "description": "Internal Server Error",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {}
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "423": {
-                        "description": "Locked",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "200": {
-                        "description": "Success or you may find errors in error array in response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ResponseWrapperCryptomanagerResponseDto"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    }
-                }
-            }
-        },
-        "/decryptWithPin": {
-            "post": {
-                "tags": [
-                    "cryptomanager"
-                ],
-                "summary": "Decrypt the data with pin",
-                "description": "Decrypt the data with pin",
-                "operationId": "decryptWithPin",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/RequestWrapperCryptoWithPinRequestDto"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "500": {
-                        "description": "Internal Server Error",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {}
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "423": {
-                        "description": "Locked",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorDTO"
-                                }
-                            }
-                        }
-                    },
-                    "200": {
-                        "description": "Success or you may find errors in error array in response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ResponseWrapperCryptoWithPinResponseDto"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    }
-                }
-            }
-        },
         "/credentialshare/request": {
             "post": {
                 "tags": [
-                    "Credential Share"
+                    "Credential Download through event or datashare"
                 ],
                 "summary": "request for credential issue",
                 "description": "This endpoint allow you to request for credential issue",
@@ -2379,7 +1809,7 @@
         "/credentialshare/download": {
             "post": {
                 "tags": [
-                    "Credential Share"
+                    "Credential Download through event or datashare"
                 ],
                 "summary": "Download the credential using OTP Flow",
                 "description": "This endpoint allow you to download credential issued",
@@ -2480,7 +1910,7 @@
         "/credentialshare/callback/notify/": {
             "post": {
                 "tags": [
-                    "Credential Share"
+                    "Credential Download through event or datashare"
                 ],
                 "summary": "Notify through web sub once credential is downloaded",
                 "description": "This endpoint allow web sub to callback once the credential is issued",
@@ -2583,7 +2013,7 @@
         "/credentialshare/callback/notify": {
             "post": {
                 "tags": [
-                    "Credential Share"
+                    "Credential Download through event or datashare"
                 ],
                 "summary": "Notify through web sub once credential is downloaded",
                 "description": "This endpoint allow web sub to callback once the credential is issued",
@@ -2686,7 +2116,7 @@
         "/credentials/download": {
             "post": {
                 "tags": [
-                    "Credentials download using OpenId4VCI"
+                    "Credentials download as guest user using OpenId4VCI"
                 ],
                 "summary": "Download credentials as PDF",
                 "description": "This endpoint allow you to download the credentials as PDF",
@@ -3315,7 +2745,7 @@
         "/wallets/{walletId}/presentations/{presentationId}/credentials": {
             "get": {
                 "tags": [
-                    "wallet-presentations-controller"
+                    "Wallet Presentations"
                 ],
                 "summary": "Get matching credentials for a presentation request",
                 "description": "This API retrieves credentials from the wallet that match the presentation definition requirements. It returns available credentials that can satisfy the presentation request along with any missing claims that are required but not available.",
@@ -4596,7 +4026,7 @@
         "/credentialshare/request/status/{requestId}": {
             "get": {
                 "tags": [
-                    "Credential Share"
+                    "Credential Download through event or datashare"
                 ],
                 "summary": "polling for credential issue status",
                 "description": "This endpoint allow you to poll for credential issue status",
