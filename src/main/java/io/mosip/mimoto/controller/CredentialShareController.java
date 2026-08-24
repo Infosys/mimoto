@@ -21,6 +21,7 @@ import io.mosip.mimoto.util.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -84,7 +85,7 @@ public class CredentialShareController {
     @PreAuthenticateContentAndVerifyIntent(secret = "${mosip.event.secret}", callback = "/v1/mimoto/credentialshare/callback/notify", topic = "${mosip.event.topic}")
     @Operation(summary = SwaggerLiteralConstants.CREDENTIALS_SHARE_HANDLE_SUBSCRIBED_EVENT_SUMMARY, 
                description = SwaggerLiteralConstants.CREDENTIALS_SHARE_HANDLE_SUBSCRIBED_EVENT_DESCRIPTION)
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Credential share callback event payload delivered by the eventing system when the issuance workflow reaches a new state.",
+    @RequestBody(description = "Credential share callback event payload delivered by the eventing system when the issuance workflow reaches a new state.",
                  required = true,
                  content = @Content(schema = @Schema(implementation = EventModel.class),
                                    mediaType = MediaType.APPLICATION_JSON_VALUE))
@@ -97,7 +98,7 @@ public class CredentialShareController {
         @ApiResponse(responseCode = "500", 
                      description = "Internal server error - Processing credential share event failed")
     })
-    public ResponseEntity<GenericResponseDTO> handleSubscribeEvent(@jakarta.validation.Valid @org.springframework.web.bind.annotation.RequestBody EventModel eventModel)
+    public ResponseEntity<GenericResponseDTO> handleSubscribeEvent(@Valid @org.springframework.web.bind.annotation.RequestBody EventModel eventModel)
             throws Exception {
         log.info("Received websub event:: transaction id = " + eventModel.getEvent().getTransactionId());
         GenericResponseDTO responseDTO = new GenericResponseDTO();
