@@ -75,6 +75,13 @@ public class IssuerConfigUtil {
                 .collect(Collectors.joining(" "));
     }
 
+    public static String toTitleCase(String input) {
+        if (input == null || input.isEmpty()) return input;
+        if (input.matches(".*_.*")) return snakeToTitleCase(input);
+        if (input.matches(".*[A-Z].*")) return camelToTitleCase(input);
+        return Character.toUpperCase(input.charAt(0)) + input.substring(1);
+    }
+
     @Cacheable(value = "issuerWellknown", key = "#p0")
     public CredentialIssuerWellKnownResponse getIssuerWellknown(String credentialIssuerHost) throws ApiNotAccessibleException, IOException, InvalidWellknownResponseException {
         String wellknownEndpoint = credentialIssuerHost + "/.well-known/openid-credential-issuer";

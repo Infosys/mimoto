@@ -30,7 +30,7 @@ import io.mosip.mimoto.service.impl.PresentationServiceImpl;
 import io.mosip.mimoto.util.LocaleUtils;
 import io.mosip.mimoto.util.SvgFixerUtil;
 import io.mosip.mimoto.util.Utilities;
-import static io.mosip.mimoto.util.IssuerConfigUtil.snakeToTitleCase;
+import static io.mosip.mimoto.util.IssuerConfigUtil.toTitleCase;
 import io.mosip.pixelpass.PixelPass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -173,15 +173,15 @@ public class CredentialPDFGeneratorService {
             valueMap.forEach((display, val) -> {
                 String displayName = display.getName();
                 String locale = display.getLocale();
-                String strVal = formatValue(val, locale);
+                Object formattedVal = formatValue(val, locale);
                 if (disclosures.contains(key)) {
                     disclosuresProps.put(key, displayName);
-                    if (maskDisclosures) {
-                        strVal = Utilities.maskValue(strVal);
+                    if (maskDisclosures && formattedVal instanceof String s) {
+                        formattedVal = Utilities.maskValue(s);
                     }
                 }
                 if (!isFaceKey && displayName != null) {
-                    rowProperties.put(key, Map.of(displayName, strVal));
+                    rowProperties.put(key, Map.of(displayName, formattedVal));
                 }
             });
         });
@@ -250,20 +250,20 @@ public class CredentialPDFGeneratorService {
         return new SelectedFace(null, null);
     }
 
-    private String formatCborMapEntry(String kvPairs) {
+    private List<Map<String, String>> parseCborMapEntry(String kvPairs) {
         return Arrays.stream(kvPairs.split(", "))
+                .filter(pair -> pair.indexOf('=') >= 0)
                 .map(pair -> {
                     int eqIdx = pair.indexOf('=');
-                    if (eqIdx < 0) return pair;
-                    String label = snakeToTitleCase(pair.substring(0, eqIdx).trim());
-                    String value = pair.substring(eqIdx + 1).trim();
-                    return "<div style=\"font-family:'Inter',sans-serif;font-weight:400;font-size:18px;margin-bottom:5px;word-wrap:break-word;padding-left:30px;\">" + label + "</div>"
-                         + "<div style=\"font-family:'Inter',sans-serif;font-weight:600;font-size:18px;word-wrap:break-word;margin-bottom:20px;padding-left:30px;\">" + value + "</div>";
+                    Map<String, String> entry = new LinkedHashMap<>();
+                    entry.put("label", toTitleCase(pair.substring(0, eqIdx).trim()));
+                    entry.put("value", pair.substring(eqIdx + 1).trim());
+                    return entry;
                 })
-                .collect(Collectors.joining());
+                .collect(Collectors.toList());
     }
 
-    private String formatValue(Object val, String locale) {
+    private Object formatValue(Object val, String locale) {
         if (val instanceof Map) {
             return Optional.ofNullable(Stream.of(
                                     ((Map<?, ?>) val).get(LdpVcV2Constants.VALUE),
@@ -313,13 +313,18 @@ public class CredentialPDFGeneratorService {
             // PixelPass stringifies complex CBOR types using Java's toString:
             // single entry: {key=value, ...}  multiple entries: [{key=value, ...}, {key=value, ...}]
             if (strVal.startsWith("{") && strVal.endsWith("}") && strVal.contains("=")) {
-                return formatCborMapEntry(strVal.substring(1, strVal.length() - 1));
+                Map<String, Object> cborWrapper = new LinkedHashMap<>();
+                cborWrapper.put("entries", parseCborMapEntry(strVal.substring(1, strVal.length() - 1)));
+                return cborWrapper;
             } else if (strVal.startsWith("[") && strVal.endsWith("]") && strVal.contains("=")) {
                 String inner = strVal.substring(1, strVal.length() - 1);
-                return Arrays.stream(inner.split("},\\s*\\{"))
+                List<Map<String, String>> allEntries = Arrays.stream(inner.split("},\\s*\\{"))
                         .map(entry -> entry.replaceAll("^\\{|\\}$", ""))
-                        .map(this::formatCborMapEntry)
-                        .collect(Collectors.joining());
+                        .flatMap(entry -> parseCborMapEntry(entry).stream())
+                        .collect(Collectors.toList());
+                Map<String, Object> cborWrapper = new LinkedHashMap<>();
+                cborWrapper.put("entries", allEntries);
+                return cborWrapper;
             }
             return strVal;
         }
