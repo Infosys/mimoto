@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -80,7 +79,7 @@ public class IssuersServiceImpl implements IssuersService {
     private IssuersDTO getAllEnabledIssuers(IssuersDTO issuersDTO) {
         return new IssuersDTO(issuersDTO.getIssuers().stream()
                 .filter(issuer -> "true".equals(issuer.getEnabled()))
-                .collect(Collectors.toList()));
+                .toList());
     }
 
     private IssuersDTO getFilteredIssuers(IssuersDTO issuersDTO, String search) {
@@ -91,7 +90,7 @@ public class IssuersServiceImpl implements IssuersService {
         return new IssuersDTO(issuersDTO.getIssuers().stream()
                 .filter(issuer -> issuer.getDisplay().stream()
                         .anyMatch(displayDTO -> displayDTO.getTitle().toLowerCase().contains(search.toLowerCase())))
-                .collect(Collectors.toList()));
+                .toList());
     }
 
     @Override
@@ -164,7 +163,7 @@ public class IssuersServiceImpl implements IssuersService {
     @Override
     public IssuersV2DTO getIssuersV2DTO() throws ApiNotAccessibleException, IOException {
         IssuersDTO issuersDTO = self.getIssuers(null);
-        List<IssuerV2DTO> list = issuersDTO.getIssuers().parallelStream().map(this::toIssuerV2DTO).collect(Collectors.toList());
+        List<IssuerV2DTO> list = issuersDTO.getIssuers().parallelStream().map(this::toIssuerV2DTO).toList();
         return new IssuersV2DTO(list);
     }
 

@@ -275,15 +275,13 @@ public class VcSdJwtCredentialFormatHandler implements CredentialFormatHandler {
         for (int i = 0; i < list.size(); i++) {
             Object item = list.get(i);
             String currentPath = path + "[" + i + "]";
-            if (item instanceof Map<?, ?> mapItem) {
-                if (mapItem.size() == 1 && mapItem.containsKey(KEY)) {
-                    Disclosure disclosure = digestToDisclosure.get(mapItem.get(KEY));
-                    if (disclosure != null) {
-                        pathToValues.put(currentPath, disclosure.getClaimValue());
-                        resolveDecodedClaimValues(disclosure.getClaimValue(), currentPath, digestToDisclosure, pathToValues);
-                    }
-                    continue;
+            if (item instanceof Map<?, ?> mapItem && mapItem.size() == 1 && mapItem.containsKey(KEY)) {
+                Disclosure disclosure = digestToDisclosure.get(mapItem.get(KEY));
+                if (disclosure != null) {
+                    pathToValues.put(currentPath, disclosure.getClaimValue());
+                    resolveDecodedClaimValues(disclosure.getClaimValue(), currentPath, digestToDisclosure, pathToValues);
                 }
+                continue;
             }
             resolveDecodedClaimValues(item, currentPath, digestToDisclosure, pathToValues);
         }

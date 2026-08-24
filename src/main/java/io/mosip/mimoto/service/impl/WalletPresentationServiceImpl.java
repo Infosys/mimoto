@@ -562,7 +562,7 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
                 .filter(cq -> cq.getPath() != null && !cq.getPath().isEmpty())
                 .map(cq -> DcqlClaimSetHelper.buildClaimPath(cq.getPath()))
                 .filter(path -> sdClaimsMap != null && hasDisclosureForPath(sdClaimsMap, path))
-                .collect(Collectors.toList());
+                .toList();
         if (!sdPaths.isEmpty()) {
             SelectedSdClaimsUtil.mergePaths(merged, credentialId, sdPaths);
             log.info("DCQL all-claims resolved for credential {} query '{}': paths={}",
@@ -574,18 +574,18 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
     private Map<String, Object> extractSdClaimsMap(DecryptedCredentialDTO dto) {
         try {
             if (!CredentialFormat.isSdJwt(dto.getCredential().getFormat())) {
-                return null;
+                return Collections.emptyMap();
             }
             Map<String, ?> allProps = credentialFormatHandlerFactory
                     .getHandler(dto.getCredential().getFormat())
                     .extractAllCredentialProperties(dto.getCredential());
             if (allProps == null || !(allProps.get("sdClaims") instanceof Map<?, ?> raw)) {
-                return null;
+                return Collections.emptyMap();
             }
             return (Map<String, Object>) raw;
         } catch (Exception e) {
             log.warn("Could not extract sdClaims for credential {}: {}", dto.getId(), e.getMessage());
-            return null;
+            return Collections.emptyMap();
         }
     }
 
@@ -845,14 +845,14 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
         ErrorDTO payload = new ErrorDTO();
         payload.setErrorCode(request.getErrorCode());
         payload.setErrorMessage(request.getErrorMessage());
-        return ResponseEntity.ok(rejectVerifier(walletId, vpSessionData, payload));
+        return ResponseEntity.ok(rejectVerifier(vpSessionData, payload));
     }
 
     /**
      * Rejects the verifier by sending error information.
      */
     private SubmitPresentationResponseDTO rejectVerifier(
-            String walletId, VerifiablePresentationSessionData vpSessionData, ErrorDTO payload)
+            VerifiablePresentationSessionData vpSessionData, ErrorDTO payload)
             throws VPErrorNotSentException {
         try {
             VerifierResponse verifierResponse = openID4VPService.sendErrorToVerifier(vpSessionData, payload);

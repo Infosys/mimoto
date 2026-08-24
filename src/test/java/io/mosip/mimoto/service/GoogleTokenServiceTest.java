@@ -319,13 +319,13 @@ class GoogleTokenServiceTest {
     }
 
     @Test
-    void processTokenWithDecryptionExceptionShouldThrowRuntimeException() throws Exception {
+    void processTokenWithDecryptionExceptionShouldThrowOAuth2AuthenticationException() throws Exception {
         // Test the DecryptionException catch block
         when(tokenDecoder.decode(idToken)).thenReturn(validJwt);
         when(userMetadataService.getUserMetadata("google-subject-id", provider))
                 .thenThrow(new io.mosip.mimoto.exception.DecryptionException("DEC_001", "Decryption failed"));
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+        assertThrows(OAuth2AuthenticationException.class, () ->
                 googleTokenService.processToken(idToken, provider, request, response));
 
         verify(tokenDecoder).decode(idToken);
