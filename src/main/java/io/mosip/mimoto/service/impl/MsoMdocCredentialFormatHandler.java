@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static io.mosip.mimoto.util.IssuerConfigUtil.camelToTitleCase;
+import static io.mosip.mimoto.util.IssuerConfigUtil.snakeToTitleCase;
 
 /**
  * Format handler for ISO 18013-5 mdoc credentials (format {@code mso_mdoc}).
@@ -164,7 +164,18 @@ public class MsoMdocCredentialFormatHandler implements CredentialFormatHandler {
                             .ifPresent(display -> localizedDisplayMap.put(key, display)));
         }
 
-        for (String key : orderedKeys) {
+        // Move complex CBOR values (PixelPass toString format: {key=value, ...} or [{...}, {...}]) to end
+        List<String> orderedKeyList = new ArrayList<>(orderedKeys);
+        List<String> complexKeys = orderedKeyList.stream()
+                .filter(k -> {
+                    Object v = credentialProperties.get(k);
+                    return v instanceof String s && (s.startsWith("{") || s.startsWith("["));
+                })
+                .collect(Collectors.toList());
+        orderedKeyList.removeAll(complexKeys);
+        orderedKeyList.addAll(complexKeys);
+
+        for (String key : orderedKeyList) {
             Object value = credentialProperties.get(key);
             if (value == null) {
                 continue;
@@ -172,7 +183,7 @@ public class MsoMdocCredentialFormatHandler implements CredentialFormatHandler {
             CredentialIssuerDisplayResponse display = localizedDisplayMap.get(key);
             if (display == null) {
                 display = new CredentialIssuerDisplayResponse();
-                display.setName(camelToTitleCase(key));
+                display.setName(snakeToTitleCase(key));
                 display.setLocale("en");
             }
             displayProperties.put(key, Map.of(display, value));
@@ -193,13 +204,23 @@ public class MsoMdocCredentialFormatHandler implements CredentialFormatHandler {
         List<String> fieldKeys = new ArrayList<>(orderedKeys);
         fieldKeys.remove("id");
 
+        // Move complex CBOR values (PixelPass toString format: {key=value, ...} or [{...}, {...}]) to end
+        List<String> complexKeys = fieldKeys.stream()
+                .filter(k -> {
+                    Object v = credentialProperties.get(k);
+                    return v instanceof String s && (s.startsWith("{") || s.startsWith("["));
+                })
+                .collect(Collectors.toList());
+        fieldKeys.removeAll(complexKeys);
+        fieldKeys.addAll(complexKeys);
+
         for (String key : fieldKeys) {
             Object value = credentialProperties.get(key);
             if (value == null) {
                 continue;
             }
             CredentialIssuerDisplayResponse display = new CredentialIssuerDisplayResponse();
-            display.setName(camelToTitleCase(key));
+            display.setName(snakeToTitleCase(key));
             display.setLocale("en");
             displayProperties.put(key, Map.of(display, value));
         }
