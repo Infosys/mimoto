@@ -238,7 +238,7 @@ public class WalletCredentialServiceImpl implements WalletCredentialService {
                 })
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .toList();
 
         log.info("Successfully decrypted {} out of {} credentials", decryptedCredentials.size(), walletCredentials.size());
         return decryptedCredentials;

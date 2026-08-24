@@ -35,7 +35,6 @@ public class DataShareServiceTest {
     DataShareServiceImpl dataShareService;
     PresentationRequestDTO presentationRequestDTO;
 
-    private static final String TEST_HOST_URL = "https://test-url";
     private static final String TEST_CREATE_URL = "https://test-url";
     private static final String TEST_GET_URL_PATTERN = "http://datashare.datashare/v1/datashare/get/static-policyid/static-subscriberid/*";
     private static final String MISCONFIGURED_GET_URL_PATTERN = "http://datashare.datashare/*";
@@ -48,7 +47,6 @@ public class DataShareServiceTest {
         dataShareService = new DataShareServiceImpl(
                 restApiClient,
                 objectMapper,
-                TEST_HOST_URL,
                 TEST_CREATE_URL,
                 TEST_GET_URL_PATTERN,
                 DEFAULT_MAX_RETRY_COUNT
@@ -67,7 +65,7 @@ public class DataShareServiceTest {
 
     @Test(expected = InvalidCredentialResourceException.class)
     public void throwRequestTimedOutExceptionWhenMaxCountIsReached() throws Exception {
-        dataShareService = new DataShareServiceImpl(restApiClient, objectMapper, TEST_HOST_URL, TEST_CREATE_URL, TEST_GET_URL_PATTERN, 0);
+        dataShareService = new DataShareServiceImpl(restApiClient, objectMapper, TEST_CREATE_URL, TEST_GET_URL_PATTERN, 0);
         dataShareService.storeDataInDataShare("SampleData", "3");
     }
 
@@ -170,7 +168,7 @@ public class DataShareServiceTest {
     @Test
     public void throwResourceInvalidRequestExceptionWhenCredentialURLIsMisconfiguredAndHasNoWildcard() {
         String expectedExceptionMsg = "invalid_resource --> Invalid resource identifier in URL";
-        dataShareService = new DataShareServiceImpl(restApiClient, objectMapper, TEST_HOST_URL, TEST_CREATE_URL, MISCONFIGURED_GET_URL_PATTERN, DEFAULT_MAX_RETRY_COUNT);
+        dataShareService = new DataShareServiceImpl(restApiClient, objectMapper, TEST_CREATE_URL, MISCONFIGURED_GET_URL_PATTERN, DEFAULT_MAX_RETRY_COUNT);
 
         presentationRequestDTO.setResource("http://datashare.datashare/");
 

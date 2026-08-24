@@ -2200,7 +2200,8 @@ public class WalletPresentationServiceTest {
         @SuppressWarnings("unchecked")
         Map<String, Object> result = (Map<String, Object>) method.invoke(walletPresentationService, credential);
 
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test

@@ -26,7 +26,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static io.mosip.mimoto.util.JwtUtils.extractJwtPayloadFromSdJwt;
 import static io.mosip.mimoto.util.JwtUtils.parseJwtHeader;
@@ -157,7 +156,6 @@ public class PresentationServiceImpl implements PresentationService {
             throw new VPNotCreatedException(ErrorConstants.INVALID_REQUEST.getErrorMessage());
         }
 
-        // OVP 1.0 / DCQL vp_token: { "<query_id>": [ presentation ] }
         Map<String, Object> vpTokenMap = new LinkedHashMap<>();
         vpTokenMap.put(queryId, List.of(presentation));
         String vpToken = objectMapper.writeValueAsString(vpTokenMap);
@@ -416,17 +414,18 @@ public class PresentationServiceImpl implements PresentationService {
     private String postVpToResponseUri(String responseUri, String redirectUri, String vpToken,
                                        String presentationSubmission, String state, SpecVersion specVersion) {
         MultiValueMap<String, String> postRequest = new LinkedMultiValueMap<>();
-        if (SpecVersion.V1 == specVersion) {
-            // OVP 1.0 / DCQL: raw JSON map { queryId: [presentation] } — not Base64-encoded
-            postRequest.add("vp_token", vpToken);
-        } else if (SpecVersion.DRAFT_23 == specVersion) {
-            postRequest.add("vp_token", Base64.getUrlEncoder().encodeToString(vpToken.getBytes(StandardCharsets.UTF_8)));
-            if (presentationSubmission != null) {
-                postRequest.add("presentation_submission", presentationSubmission);
+        switch (specVersion) {
+            case V1 -> postRequest.add("vp_token", vpToken);
+            case DRAFT_23 -> {
+                postRequest.add("vp_token", Base64.getUrlEncoder().encodeToString(vpToken.getBytes(StandardCharsets.UTF_8)));
+                if (presentationSubmission != null) {
+                    postRequest.add("presentation_submission", presentationSubmission);
+                }
             }
-        } else {
-            log.error("Unsupported OpenID4VP spec_version for direct_post: {}", specVersion);
-            throw new VPNotCreatedException(ErrorConstants.INVALID_REQUEST.getErrorMessage());
+            default -> {
+                log.error("Unsupported OpenID4VP spec_version for direct_post: {}", specVersion);
+                throw new VPNotCreatedException(ErrorConstants.INVALID_REQUEST.getErrorMessage());
+            }
         }
 
         if (state != null) {
@@ -496,7 +495,7 @@ public class PresentationServiceImpl implements PresentationService {
                 .stream().map(verifiableCredential -> SubmissionDescriptorDTO.builder()
                         .id(inputDescriptorDTO.getId())
                         .format(format)
-                        .path("$.verifiableCredential[" + atomicInteger.getAndIncrement() + "]").build()).collect(Collectors.toList());
+                        .path("$.verifiableCredential[" + atomicInteger.getAndIncrement() + "]").build()).toList();
 
         PresentationSubmissionDTO presentationSubmissionDTO = PresentationSubmissionDTO.builder()
                 .id(UUID.randomUUID().toString())

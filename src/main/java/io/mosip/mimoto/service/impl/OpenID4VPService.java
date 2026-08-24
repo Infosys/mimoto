@@ -22,7 +22,7 @@ import io.mosip.openID4VP.dcql.query.DCQLQuery;
 import io.mosip.openID4VP.exceptions.OpenID4VPExceptions;
 import io.mosip.openID4VP.verifier.VerifierResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -36,7 +36,7 @@ import static io.mosip.openID4VP.authorizationRequest.WalletConfigDefaultsKt.get
 import static io.mosip.openID4VP.authorizationRequest.WalletConfigDefaultsKt.getDefaultResponseTypeSupported;
 import static io.mosip.openID4VP.authorizationRequest.WalletConfigDefaultsKt.getDefaultSignatureAlgorithmSupported;
 
-@Component
+@Service
 @Slf4j
 public class OpenID4VPService {
 
