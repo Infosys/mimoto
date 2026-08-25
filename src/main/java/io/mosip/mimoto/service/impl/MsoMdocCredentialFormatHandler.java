@@ -164,18 +164,7 @@ public class MsoMdocCredentialFormatHandler implements CredentialFormatHandler {
                             .ifPresent(display -> localizedDisplayMap.put(key, display)));
         }
 
-        // Move complex CBOR values (PixelPass toString format: {key=value, ...} or [{...}, {...}]) to end
-        List<String> orderedKeyList = new ArrayList<>(orderedKeys);
-        List<String> complexKeys = orderedKeyList.stream()
-                .filter(k -> {
-                    Object v = credentialProperties.get(k);
-                    return v instanceof String s && (s.startsWith("{") || s.startsWith("["));
-                })
-                .collect(Collectors.toList());
-        orderedKeyList.removeAll(complexKeys);
-        orderedKeyList.addAll(complexKeys);
-
-        for (String key : orderedKeyList) {
+        for (String key : orderedKeys) {
             Object value = credentialProperties.get(key);
             if (value == null) {
                 continue;
@@ -203,16 +192,6 @@ public class MsoMdocCredentialFormatHandler implements CredentialFormatHandler {
         LinkedHashMap<String, Map<CredentialIssuerDisplayResponse, Object>> displayProperties = new LinkedHashMap<>();
         List<String> fieldKeys = new ArrayList<>(orderedKeys);
         fieldKeys.remove("id");
-
-        // Move complex CBOR values (PixelPass toString format: {key=value, ...} or [{...}, {...}]) to end
-        List<String> complexKeys = fieldKeys.stream()
-                .filter(k -> {
-                    Object v = credentialProperties.get(k);
-                    return v instanceof String s && (s.startsWith("{") || s.startsWith("["));
-                })
-                .collect(Collectors.toList());
-        fieldKeys.removeAll(complexKeys);
-        fieldKeys.addAll(complexKeys);
 
         for (String key : fieldKeys) {
             Object value = credentialProperties.get(key);
