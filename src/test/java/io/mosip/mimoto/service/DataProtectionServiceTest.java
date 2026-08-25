@@ -95,9 +95,9 @@ public class DataProtectionServiceTest {
     @Test
     public void shouldEncryptPrivateKeyWithAESSuccessfully() throws Exception {
         SecretKey aesKey = SigningKeyUtil.generateEncryptionKey("AES", 256);
-        KeyPair keyPair = SigningKeyUtil.generateKeyPair(SigningAlgorithm.ED25519);
+        KeyPair localKeyPair = SigningKeyUtil.generateKeyPair(SigningAlgorithm.ED25519);
 
-        String encryptedPrivateKey = dataProtectionService.encryptWithAES(aesKey, keyPair.getPrivate().getEncoded());
+        String encryptedPrivateKey = dataProtectionService.encryptWithAES(aesKey, localKeyPair.getPrivate().getEncoded());
 
         assertNotNull(encryptedPrivateKey);
         assertFalse(StringUtils.isBlank(encryptedPrivateKey));
@@ -126,26 +126,26 @@ public class DataProtectionServiceTest {
     @Test(expected = RuntimeException.class)
     public void shouldThrowRuntimeExceptionWhenEncryptionFails() {
         String data = "testData";
-        String refId = "refId";
-        String aad = "aad";
-        String salt = "salt";
+        String localRefId = "refId";
+        String localAad = "aad";
+        String localSalt = "salt";
         when(cryptomanagerService.encrypt(any(CryptomanagerRequestDto.class)))
                 .thenThrow(new RuntimeException("Simulated encryption failure"));
 
-        dataProtectionService.encrypt(data, refId, aad, salt);
+        dataProtectionService.encrypt(data, localRefId, localAad, localSalt);
     }
 
 
     @Test(expected = RuntimeException.class)
     public void shouldThrowRuntimeExceptionWhenDecryptionFails() {
         String data = "encryptedData";
-        String refId = "refId";
-        String aad = "aad";
-        String salt = "salt";
+        String localRefId = "refId";
+        String localAad = "aad";
+        String localSalt = "salt";
         when(cryptomanagerService.decrypt(any(CryptomanagerRequestDto.class)))
                 .thenThrow(new RuntimeException("Simulated decryption failure"));
 
-        dataProtectionService.decrypt(data, refId, aad, salt);
+        dataProtectionService.decrypt(data, localRefId, localAad, localSalt);
     }
 
 
