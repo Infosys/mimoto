@@ -95,12 +95,13 @@ class VcSdJwtCredentialFormatHandlerTest {
             when(mockSdJwt.getCredentialJwt()).thenReturn(sampleJwtString);
             when(mockSdJwt.getDisclosures()).thenReturn(new ArrayList<>());
 
-            // Mock JWT payload without credentialSubject
+            // JWT payload with flat top-level claims and no credentialSubject wrapper
             Map<String, Object> jwtPayload = new HashMap<>();
-            jwtPayload.put("name", "John Doe");
-            jwtPayload.put("admin", true);
+            jwtPayload.put("firstName", "Jane");
+            jwtPayload.put("lastName", "Smith");
+            jwtPayload.put("age", 30);
             jwtPayload.put("iss", "https://example.com");
-            jwtPayload.put("sub", "1234567890");
+            jwtPayload.put("sub", "9876543210");
             jwtPayload.put("iat", 1516239022);
 
             mockedJwtUtils.when(() -> JwtUtils.parseJwtPayload(sampleJwtString))
@@ -109,8 +110,11 @@ class VcSdJwtCredentialFormatHandlerTest {
             Map<String, Object> result = vcSdJwtCredentialFormatHandler.extractCredentialClaims(vcCredentialResponse);
 
             assertNotNull(result);
-            assertEquals("John Doe", result.get("name"));
-            assertEquals(true, result.get("admin"));
+            assertEquals("Jane", result.get("firstName"));
+            assertEquals("Smith", result.get("lastName"));
+            assertEquals(30, result.get("age"));
+            // No credentialSubject wrapping — claims are at the top level
+            assertFalse(result.containsKey("credentialSubject"));
             // Metadata fields should be removed
             assertFalse(result.containsKey("iss"));
             assertFalse(result.containsKey("sub"));

@@ -111,11 +111,11 @@ public class IdpServiceTest {
 
     @Test
     public void shouldReturnTokenEndpointFromCredentialIssuerConfigurationResponse() {
-        CredentialIssuerConfiguration credentialIssuerConfiguration =
+        CredentialIssuerConfiguration localCredentialIssuerConfiguration =
                 getCredentialIssuerConfigurationResponseDto("issuer1", "CredentialType1", List.of());
         String expectedTokenEndpoint = "https://dev/token";
 
-        String actualTokenEndpoint = idpService.getTokenEndpoint(credentialIssuerConfiguration);
+        String actualTokenEndpoint = idpService.getTokenEndpoint(localCredentialIssuerConfiguration);
 
         assertEquals(expectedTokenEndpoint, actualTokenEndpoint);
     }

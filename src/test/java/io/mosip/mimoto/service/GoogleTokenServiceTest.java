@@ -206,9 +206,6 @@ class GoogleTokenServiceTest {
 
     @Test
     void processTokenWithExistingUserMetadataAndNullNameShouldUseSavedName() throws Exception {
-        // Test when userMetadata exists and name is null - should use saved display name
-        UserMetadataDTO existingMetadata = new UserMetadataDTO("Saved Name", "http://example.com/saved-pic.jpg", "test@example.com", null);
-        
         Map<String, Object> claimsWithoutName = new HashMap<>(claims);
         claimsWithoutName.remove("name");
         Jwt jwtWithoutName = Jwt.withTokenValue(idToken)
