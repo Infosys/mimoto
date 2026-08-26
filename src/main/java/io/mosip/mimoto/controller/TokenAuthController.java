@@ -123,7 +123,7 @@ public class TokenAuthController {
             tokenService.processToken(idToken, provider, request, response);
             return ResponseEntity.ok(SESSION_CREATED);
         } catch (OAuth2AuthenticationException e) {
-            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(e, e.getErrorCode(), HttpStatus.UNAUTHORIZED, MediaType.APPLICATION_JSON);
+            return Utilities.getErrorResponseEntityWithoutWrapper(e, e.getErrorCode(), HttpStatus.UNAUTHORIZED, MediaType.APPLICATION_JSON);
         }
     }
 }

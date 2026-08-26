@@ -299,14 +299,14 @@ public class WalletCredentialsController {
             return ResponseEntity.status(HttpStatus.OK).<Object>build();
         } catch (InvalidRequestException exception) {
             log.error("Invalid request: {}", exception.getMessage());
-            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(
+            return Utilities.getErrorResponseEntityWithoutWrapper(
                     exception,
                     exception.getErrorCode(),
                     HttpStatus.BAD_REQUEST,
                     MediaType.APPLICATION_JSON);
         } catch (CredentialNotFoundException exception) {
             log.error("Credential not found: {}", exception.getMessage());
-            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(
+            return Utilities.getErrorResponseEntityWithoutWrapper(
                     exception,
                     exception.getErrorCode(),
                     HttpStatus.NOT_FOUND,

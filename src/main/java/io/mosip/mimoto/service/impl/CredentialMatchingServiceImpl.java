@@ -177,8 +177,8 @@ public class CredentialMatchingServiceImpl implements CredentialMatchingService 
 
         List<DecryptedCredentialDTO> matchingCredentials = decryptedCredentials.stream()
                 .filter(credential -> matchedCredentialIds.contains(credential.getId()))
+                .peek(credential -> credential.setIdentifier(credentialToInputDescriptor.get(credential.getId())))
                 .toList();
-        matchingCredentials.forEach(credential -> credential.setIdentifier(credentialToInputDescriptor.get(credential.getId())));
 
         return MatchingCredentialsDTO.builder()
                 .matchingCredentialsResponse(matchingCredentialsResponse)

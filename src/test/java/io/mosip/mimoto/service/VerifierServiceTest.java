@@ -21,7 +21,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -56,7 +55,6 @@ public class VerifierServiceTest {
 
     @BeforeEach
     public void setUp() throws JsonProcessingException {
-        ReflectionTestUtils.setField(verifiersService, "self", verifiersService);
         VerifiersDTO verifiersDTO = TestUtilities.getTrustedVerifiers();
         String verifiersListString = TestUtilities.getObjectAsString(verifiersDTO);
         lenient().when(utilities.getTrustedVerifiersJsonValue()).thenReturn(verifiersListString);
