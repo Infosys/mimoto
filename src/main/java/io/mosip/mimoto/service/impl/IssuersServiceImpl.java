@@ -13,9 +13,7 @@ import io.mosip.mimoto.util.Utilities;
 import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,10 +38,6 @@ public class IssuersServiceImpl implements IssuersService {
     private final String contextPath;
 
     private static final String GET_TOKEN_PATH = "/get-token/";
-
-    @Lazy
-    @Autowired
-    private IssuersService self;
 
     public IssuersServiceImpl(Utilities utilities, ObjectMapper objectMapper, IssuerConfigUtil issuersConfigUtil,
                               @Value("${mosip.api.public.url}") String mosipApiPublicUrl,
@@ -162,7 +156,7 @@ public class IssuersServiceImpl implements IssuersService {
 
     @Override
     public IssuersV2DTO getIssuersV2DTO() throws ApiNotAccessibleException, IOException {
-        IssuersDTO issuersDTO = self.getIssuers(null);
+        IssuersDTO issuersDTO = getIssuers(null);
         List<IssuerV2DTO> list = issuersDTO.getIssuers().parallelStream().map(this::toIssuerV2DTO).toList();
         return new IssuersV2DTO(list);
     }

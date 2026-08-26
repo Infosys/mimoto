@@ -135,7 +135,7 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
             // Determine the action based on request content
             if (request.isSubmissionRequest()) {
                 if (base64Key == null || base64Key.isBlank()) {
-                    return Utilities.<Object>getErrorResponseEntityWithoutWrapper(
+                    return Utilities.getErrorResponseEntityWithoutWrapper(
                             new InvalidRequestException(INVALID_REQUEST.getErrorCode(),
                                     "Wallet key is required for credential presentation"),
                             INVALID_REQUEST.getErrorCode(), HttpStatus.BAD_REQUEST, MediaType.APPLICATION_JSON);
@@ -147,25 +147,25 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
             if (request.isRejectionRequest()) {
                 return handleVerifierRejection(walletId, vpSessionData, request);
             }
-            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(
+            return Utilities.getErrorResponseEntityWithoutWrapper(
                     new InvalidRequestException(INVALID_REQUEST.getErrorCode(),
                             "Request must contain selectedCredentials / dcqlSelections or both errorCode and errorMessage"),
                     INVALID_REQUEST.getErrorCode(), HttpStatus.BAD_REQUEST, MediaType.APPLICATION_JSON);
 
         } catch (JOSEException ex) {
-            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(
+            return Utilities.getErrorResponseEntityWithoutWrapper(
                     ex, JWT_SIGNING_ERROR.getErrorCode(), HttpStatus.INTERNAL_SERVER_ERROR, MediaType.APPLICATION_JSON);
         } catch (KeyGenerationException | DecryptionException ex) {
-            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(
+            return Utilities.getErrorResponseEntityWithoutWrapper(
                     ex, KEY_GENERATION_ERROR.getErrorCode(), HttpStatus.INTERNAL_SERVER_ERROR, MediaType.APPLICATION_JSON);
         } catch (ApiNotAccessibleException | IOException ex) {
-            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(
+            return Utilities.getErrorResponseEntityWithoutWrapper(
                     ex, WALLET_CREATE_VP_EXCEPTION.getErrorCode(), HttpStatus.INTERNAL_SERVER_ERROR, MediaType.APPLICATION_JSON);
         } catch (VPErrorNotSentException ex) {
-            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(
+            return Utilities.getErrorResponseEntityWithoutWrapper(
                     ex, REJECT_VERIFIER_EXCEPTION.getErrorCode(), HttpStatus.INTERNAL_SERVER_ERROR, MediaType.APPLICATION_JSON);
         } catch (IllegalStateException | java.lang.IllegalArgumentException ex) {
-            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(
+            return Utilities.getErrorResponseEntityWithoutWrapper(
                     ex, INVALID_REQUEST.getErrorCode(), HttpStatus.BAD_REQUEST, MediaType.APPLICATION_JSON);
         } catch (OpenID4VPExceptions ex) {
             log.error("OpenID4VP error during presentation submission for presentationId={}", presentationId, ex);
@@ -173,7 +173,7 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
                 log.error("OpenID4VP root cause for presentationId={}: {}", presentationId,
                         ex.getCause().getMessage(), ex.getCause());
             }
-            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(
+            return Utilities.getErrorResponseEntityWithoutWrapper(
                     ex, ex.getErrorCode(), HttpStatus.BAD_REQUEST, MediaType.APPLICATION_JSON);
         }
     }

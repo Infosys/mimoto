@@ -1,6 +1,7 @@
 package io.mosip.mimoto.service.impl;
 
 import io.mosip.mimoto.dto.ErrorDTO;
+import io.mosip.mimoto.dto.openid.VerifierDTO;
 import io.mosip.mimoto.dto.resident.VerifiablePresentationSessionData;
 import io.mosip.mimoto.exception.ApiNotAccessibleException;
 import io.mosip.mimoto.service.VerifierService;
@@ -158,7 +159,7 @@ public class OpenID4VPService {
     }
 
     public List<Verifier> getPreRegisteredVerifiers() throws ApiNotAccessibleException, IOException {
-        List<io.mosip.mimoto.dto.openid.VerifierDTO> verifiers = verifierService.getTrustedVerifiers().getVerifiers();
+        List<VerifierDTO> verifiers = verifierService.getTrustedVerifiers().getVerifiers();
         if (verifiers == null) {
             return Collections.emptyList();
         }

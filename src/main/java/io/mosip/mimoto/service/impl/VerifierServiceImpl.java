@@ -19,9 +19,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Lazy;
 
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -40,10 +38,6 @@ public class VerifierServiceImpl implements VerifierService {
     private final ObjectMapper objectMapper;
 
     private final VerifierRepository verifierRepository;
-
-    @Lazy
-    @Autowired
-    private VerifierService self;
 
     private static final PathMatcher pathMatcher;
     private static final UrlValidator urlValidator;
@@ -69,7 +63,7 @@ public class VerifierServiceImpl implements VerifierService {
     }
 
     public Optional<VerifierDTO> getVerifierByClientId(String clientId) throws ApiNotAccessibleException, IOException {
-        VerifiersDTO verifiersDTO = self.getTrustedVerifiers();
+        VerifiersDTO verifiersDTO = getTrustedVerifiers();
         return verifiersDTO.getVerifiers().stream().filter(verifier -> verifier.getClientId().equals(clientId)).findFirst();
     }
 

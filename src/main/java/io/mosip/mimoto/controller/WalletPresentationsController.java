@@ -214,20 +214,20 @@ public class WalletPresentationsController {
 
             if (vpSessionData == null) {
                 log.error("No presentation session data found in session for presentationId: {}", presentationId);
-                return Utilities.<Object>getErrorResponseEntityWithoutWrapper(new InvalidRequestException(INVALID_REQUEST.getErrorCode(), "presentationId not found in session"), INVALID_REQUEST.getErrorCode(), HttpStatus.BAD_REQUEST, MediaType.APPLICATION_JSON);
+                return Utilities.getErrorResponseEntityWithoutWrapper(new InvalidRequestException(INVALID_REQUEST.getErrorCode(), "presentationId not found in session"), INVALID_REQUEST.getErrorCode(), HttpStatus.BAD_REQUEST, MediaType.APPLICATION_JSON);
             }
 
             String base64Key = (String) httpSession.getAttribute(SessionKeys.WALLET_KEY);
             if (base64Key == null) {
                 log.warn("Wallet key not found in session for walletId: {}", walletId);
-                return Utilities.<Object>getErrorResponseEntityFromPlatformErrorMessage(UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED, MediaType.APPLICATION_JSON);
+                return Utilities.getErrorResponseEntityFromPlatformErrorMessage(UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED, MediaType.APPLICATION_JSON);
             }
 
             return walletPresentationService.handlePresentationAction(walletId, presentationId, request, vpSessionData, base64Key);
 
         }
         catch (IllegalArgumentException exception){
-            return Utilities.<Object>getErrorResponseEntityWithoutWrapper(exception, INVALID_REQUEST.getErrorCode(), HttpStatus.BAD_REQUEST, MediaType.APPLICATION_JSON);
+            return Utilities.getErrorResponseEntityWithoutWrapper(exception, INVALID_REQUEST.getErrorCode(), HttpStatus.BAD_REQUEST, MediaType.APPLICATION_JSON);
         }
     }
 }
