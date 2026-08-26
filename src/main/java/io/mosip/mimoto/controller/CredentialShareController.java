@@ -99,7 +99,7 @@ public class CredentialShareController {
         @ApiResponse(responseCode = "500",
                      description = "Internal server error - Processing credential share event failed")
     })
-    public ResponseEntity<GenericResponseDTO> handleSubscribeEvent(@Valid @RequestBody EventModel eventModel)
+    public ResponseEntity<GenericResponseDTO> handleSubscribeEvent(@org.springframework.web.bind.annotation.RequestBody EventModel eventModel)
             throws IOException {
         log.info("Received websub event:: transaction id = " + eventModel.getEvent().getTransactionId());
         GenericResponseDTO responseDTO = new GenericResponseDTO();
@@ -129,7 +129,7 @@ public class CredentialShareController {
      */
     @PostMapping(path = "/request", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = SwaggerLiteralConstants.CREDENTIALS_SHARE_REQUEST_VC_SUMMARY, description = SwaggerLiteralConstants.CREDENTIALS_SHARE_REQUEST_VC_DESCRIPTION)
-    public ResponseEntity<CredentialRequestResponseDTO> request(@RequestBody AppCredentialRequestDTO requestDTO)
+    public ResponseEntity<CredentialRequestResponseDTO> request(@org.springframework.web.bind.annotation.RequestBody AppCredentialRequestDTO requestDTO)
             throws ApisResourceAccessException, IOException {
 
         if (StringUtils.isEmpty(requestDTO.getIndividualId())) {
@@ -200,7 +200,7 @@ public class CredentialShareController {
      */
     @PostMapping(path = "/download", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = SwaggerLiteralConstants.CREDENTIALS_SHARE_DOWNLOAD_VC_SUMMARY, description = SwaggerLiteralConstants.CREDENTIALS_SHARE_DOWNLOAD_VC_DESCRIPTION)
-    public ResponseEntity<CredentialDownloadResponseDTO> download(@Valid @RequestBody CredentialDownloadRequestDTO requestDTO, BindingResult result) {
+    public ResponseEntity<CredentialDownloadResponseDTO> download(@Valid @org.springframework.web.bind.annotation.RequestBody CredentialDownloadRequestDTO requestDTO, BindingResult result) {
         try {
             requestValidator.validateInputRequest(result);
             JsonNode decryptedCredentialJSON = utilities.getDecryptedVC(requestDTO.getRequestId());
