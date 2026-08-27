@@ -121,11 +121,10 @@ public class VcSdJwtCredentialFormatHandler implements CredentialFormatHandler {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Map<String, Object> extractAllCredentialProperties(VCCredentialResponse vcCredentialResponse) {
         Object credential = vcCredentialResponse.getCredential();
         if (credential instanceof String) {
-            return (Map<String, Object>) (Map<?, ?>) extractAllPropertiesFromSdJwt((String) credential);
+            return extractAllPropertiesFromSdJwt((String) credential);
         }
         return Collections.emptyMap();
     }
@@ -157,11 +156,11 @@ public class VcSdJwtCredentialFormatHandler implements CredentialFormatHandler {
         }
     }
 
-    public Map<String, Map<String, Object>> extractAllPropertiesFromSdJwt(String sdJwtString) {
+    public Map<String, Object> extractAllPropertiesFromSdJwt(String sdJwtString) {
         try {
             SDJWT sdJwt = SDJWT.parse(sdJwtString);
 
-            Map<String, Map<String, Object>> claims = new LinkedHashMap<>();
+            Map<String, Object> claims = new LinkedHashMap<>();
 
             // Extract public claims from the credential JWT
             claims.put("publicClaims", extractPublicClaims(sdJwt));

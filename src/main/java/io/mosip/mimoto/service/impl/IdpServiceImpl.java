@@ -50,6 +50,8 @@ public class IdpServiceImpl implements IdpService {
     private static final String GRANT_TYPE = "grant_type";
     private static final String REDIRECT_URI = "redirect_uri";
     private static final String CODE_VERIFIER = "code_verifier";
+    // RFC 7636 §4.1: code_verifier = 43*128unreserved; unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
+    private static final String CODE_VERIFIER_PATTERN = "^[A-Za-z0-9\\-._~]{43,128}$";
 
     private final JoseUtil joseUtil;
 
@@ -106,7 +108,7 @@ public class IdpServiceImpl implements IdpService {
         try {
             String issuerId = params.get("issuer");
             String codeVerifier = params.get(CODE_VERIFIER);
-            if (codeVerifier == null || !codeVerifier.matches("^[A-Za-z0-9\\-._~]{43,128}$")) {
+            if (codeVerifier == null || !codeVerifier.matches(CODE_VERIFIER_PATTERN)) {
                 throw new InvalidRequestException(INVALID_REQUEST.getErrorCode(), "Invalid code verifier.");
             }
 
@@ -185,7 +187,7 @@ public class IdpServiceImpl implements IdpService {
     }
 
     private void validateCodeVerifier(String codeVerifier) {
-        if (codeVerifier == null || !codeVerifier.matches("^[A-Za-z0-9\\-._~]{43,128}$")) {
+        if (codeVerifier == null || !codeVerifier.matches(CODE_VERIFIER_PATTERN)) {
             throw new InvalidRequestException(INVALID_REQUEST.getErrorCode(), "Invalid code verifier.");
         }
     }

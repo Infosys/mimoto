@@ -563,7 +563,7 @@ class VcSdJwtCredentialFormatHandlerTest {
             assertNotNull(result);
             assertTrue(result.containsKey("publicClaims"));
             assertTrue(result.containsKey("sdClaims"));
-            assertEquals("John", result.get("publicClaims").get("name"));
+            assertEquals("John", ((Map<?, ?>) result.get("publicClaims")).get("name"));
         }
     }
 
@@ -587,7 +587,7 @@ class VcSdJwtCredentialFormatHandlerTest {
             mockedSdJwt.when(() -> SDJWT.parse("bad-jwt"))
                     .thenThrow(new IllegalArgumentException("Invalid SD-JWT"));
 
-            Map<String, Map<String, Object>> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt("bad-jwt");
+            Map<String, Object> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt("bad-jwt");
 
             assertNotNull(result);
             assertTrue(result.isEmpty());
@@ -600,7 +600,7 @@ class VcSdJwtCredentialFormatHandlerTest {
             mockedSdJwt.when(() -> SDJWT.parse("bad-jwt"))
                     .thenThrow(new RuntimeException("Unexpected"));
 
-            Map<String, Map<String, Object>> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt("bad-jwt");
+            Map<String, Object> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt("bad-jwt");
 
             assertNotNull(result);
             assertTrue(result.isEmpty());
@@ -619,11 +619,11 @@ class VcSdJwtCredentialFormatHandlerTest {
 
             mockedJwtUtils.when(() -> JwtUtils.parseJwtPayload(sampleJwtString)).thenReturn(null);
 
-            Map<String, Map<String, Object>> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
+            Map<String, Object> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
 
             assertNotNull(result);
-            assertTrue(result.get("publicClaims").isEmpty());
-            assertTrue(result.get("sdClaims").isEmpty());
+            assertTrue(((Map<?, ?>) result.get("publicClaims")).isEmpty());
+            assertTrue(((Map<?, ?>) result.get("sdClaims")).isEmpty());
         }
     }
 
@@ -652,12 +652,12 @@ class VcSdJwtCredentialFormatHandlerTest {
             payload.put("iss", "https://example.com");
             mockedJwtUtils.when(() -> JwtUtils.parseJwtPayload(sampleJwtString)).thenReturn(payload);
 
-            Map<String, Map<String, Object>> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
+            Map<String, Object> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
 
             assertNotNull(result);
-            Map<String, Object> sdClaims = result.get("sdClaims");
+            Map<String, Object> sdClaims = (Map<String, Object>) result.get("sdClaims");
             assertTrue(sdClaims.containsKey("given_name"));
-            assertEquals("John", result.get("sdClaimValues").get("given_name"));
+            assertEquals("John", ((Map<?, ?>) result.get("sdClaimValues")).get("given_name"));
         }
     }
 
@@ -675,10 +675,10 @@ class VcSdJwtCredentialFormatHandlerTest {
             payload.put("_sd", Arrays.asList("unknownDigest"));
             mockedJwtUtils.when(() -> JwtUtils.parseJwtPayload(sampleJwtString)).thenReturn(payload);
 
-            Map<String, Map<String, Object>> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
+            Map<String, Object> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
 
             assertNotNull(result);
-            assertTrue(result.get("sdClaims").isEmpty());
+            assertTrue(((Map<?, ?>) result.get("sdClaims")).isEmpty());
         }
     }
 
@@ -707,10 +707,10 @@ class VcSdJwtCredentialFormatHandlerTest {
             payload.put("_sd", Arrays.asList("digest_sd", "digest_key"));
             mockedJwtUtils.when(() -> JwtUtils.parseJwtPayload(sampleJwtString)).thenReturn(payload);
 
-            Map<String, Map<String, Object>> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
+            Map<String, Object> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
 
             assertNotNull(result);
-            Map<String, Object> sdClaims = result.get("sdClaims");
+            Map<String, Object> sdClaims = (Map<String, Object>) result.get("sdClaims");
             assertFalse(sdClaims.containsKey("_sd"));
             assertFalse(sdClaims.containsKey("..."));
         }
@@ -740,10 +740,10 @@ class VcSdJwtCredentialFormatHandlerTest {
             payload.put("address", addressMap);
             mockedJwtUtils.when(() -> JwtUtils.parseJwtPayload(sampleJwtString)).thenReturn(payload);
 
-            Map<String, Map<String, Object>> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
+            Map<String, Object> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
 
             assertNotNull(result);
-            Map<String, Object> sdClaims = result.get("sdClaims");
+            Map<String, Object> sdClaims = (Map<String, Object>) result.get("sdClaims");
             assertTrue(sdClaims.containsKey("address.city"));
         }
     }
@@ -775,10 +775,10 @@ class VcSdJwtCredentialFormatHandlerTest {
             payload.put("nationalities", arrayWithDisclosure);
             mockedJwtUtils.when(() -> JwtUtils.parseJwtPayload(sampleJwtString)).thenReturn(payload);
 
-            Map<String, Map<String, Object>> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
+            Map<String, Object> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
 
             assertNotNull(result);
-            Map<String, Object> sdClaims = result.get("sdClaims");
+            Map<String, Object> sdClaims = (Map<String, Object>) result.get("sdClaims");
             assertTrue(sdClaims.containsKey("nationalities[0]"));
         }
     }
@@ -803,10 +803,10 @@ class VcSdJwtCredentialFormatHandlerTest {
             payload.put("items", arrayWithDisclosure);
             mockedJwtUtils.when(() -> JwtUtils.parseJwtPayload(sampleJwtString)).thenReturn(payload);
 
-            Map<String, Map<String, Object>> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
+            Map<String, Object> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
 
             assertNotNull(result);
-            assertTrue(result.get("sdClaims").isEmpty());
+            assertTrue(((Map<?, ?>) result.get("sdClaims")).isEmpty());
         }
     }
 
@@ -838,10 +838,10 @@ class VcSdJwtCredentialFormatHandlerTest {
             payload.put("entries", listValue);
             mockedJwtUtils.when(() -> JwtUtils.parseJwtPayload(sampleJwtString)).thenReturn(payload);
 
-            Map<String, Map<String, Object>> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
+            Map<String, Object> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
 
             assertNotNull(result);
-            Map<String, Object> sdClaims = result.get("sdClaims");
+            Map<String, Object> sdClaims = (Map<String, Object>) result.get("sdClaims");
             assertTrue(sdClaims.containsKey("entries[0].secret"));
         }
     }
@@ -859,10 +859,10 @@ class VcSdJwtCredentialFormatHandlerTest {
             mockedJwtUtils.when(() -> JwtUtils.parseJwtPayload(sampleJwtString))
                     .thenReturn(new HashMap<>());
 
-            Map<String, Map<String, Object>> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
+            Map<String, Object> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
 
             assertNotNull(result);
-            assertTrue(result.get("sdClaims").isEmpty());
+            assertTrue(((Map<?, ?>) result.get("sdClaims")).isEmpty());
         }
     }
 
@@ -885,10 +885,10 @@ class VcSdJwtCredentialFormatHandlerTest {
             payload.put("_sd", Arrays.asList("digest_null_name"));
             mockedJwtUtils.when(() -> JwtUtils.parseJwtPayload(sampleJwtString)).thenReturn(payload);
 
-            Map<String, Map<String, Object>> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
+            Map<String, Object> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
 
             assertNotNull(result);
-            assertTrue(result.get("sdClaims").isEmpty());
+            assertTrue(((Map<?, ?>) result.get("sdClaims")).isEmpty());
         }
     }
 
@@ -952,10 +952,10 @@ class VcSdJwtCredentialFormatHandlerTest {
             payload.put("_sd", Arrays.asList("d1"));
             mockedJwtUtils.when(() -> JwtUtils.parseJwtPayload(sampleJwtString)).thenReturn(payload);
 
-            Map<String, Map<String, Object>> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
+            Map<String, Object> result = vcSdJwtCredentialFormatHandler.extractAllPropertiesFromSdJwt(sampleSdJwtString);
 
             assertNotNull(result);
-            Map<String, Object> sdClaims = result.get("sdClaims");
+            Map<String, Object> sdClaims = (Map<String, Object>) result.get("sdClaims");
             assertTrue(sdClaims.containsKey("l1"));
             assertTrue(sdClaims.containsKey("l1.l2"));
             assertTrue(sdClaims.containsKey("l1.l2.l3"));

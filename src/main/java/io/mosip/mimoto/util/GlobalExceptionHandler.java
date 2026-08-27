@@ -92,6 +92,34 @@ public class GlobalExceptionHandler {
         return new ErrorDTO(ex.getErrorCode(), ex.getErrorText());
     }
 
+    @ExceptionHandler(ApiNotAccessibleException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ErrorDTO handleApiNotAccessibleException(ApiNotAccessibleException ex) {
+        log.error("API not accessible: ", ex);
+        return new ErrorDTO(ex.getErrorCode(), ex.getErrorText());
+    }
+
+    @ExceptionHandler(InvalidCredentialResourceException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDTO handleInvalidCredentialResource(InvalidCredentialResourceException ex) {
+        log.error("Invalid credential resource: ", ex);
+        return new ErrorDTO(ex.getErrorCode(), ex.getErrorText());
+    }
+
+    @ExceptionHandler(VCVerificationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDTO handleVCVerificationException(VCVerificationException ex) {
+        log.error("VC verification failed: ", ex);
+        return new ErrorDTO(ex.getErrorCode(), ex.getErrorText());
+    }
+
+    @ExceptionHandler(CredentialNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorDTO handleCredentialNotFoundException(CredentialNotFoundException ex) {
+        log.error("Credential not found: ", ex);
+        return new ErrorDTO(ex.getErrorCode(), ex.getErrorText());
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDTO handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {

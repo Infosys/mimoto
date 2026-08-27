@@ -270,7 +270,7 @@ public class Utilities {
         return (ResponseEntity<T>) responseEntity.body(new ErrorDTO(errorCode, errorMessage));
     }
 
-    public static ResponseEntity<Object> buildErrorResponse(HttpStatus status, String errorCode, String message) {
+    public static ResponseEntity<ErrorDTO> buildErrorResponse(HttpStatus status, String errorCode, String message) {
         return ResponseEntity
                 .status(status)
                 .contentType(MediaType.APPLICATION_JSON)
