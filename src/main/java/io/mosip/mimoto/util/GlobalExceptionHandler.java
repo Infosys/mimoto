@@ -93,7 +93,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ApiNotAccessibleException.class)
-    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDTO handleApiNotAccessibleException(ApiNotAccessibleException ex) {
         log.error("API not accessible: ", ex);
         return new ErrorDTO(ex.getErrorCode(), ex.getErrorText());

@@ -99,7 +99,7 @@ public class CredentialsControllerTest {
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(requestContent))
-                .andExpect(status().isServiceUnavailable())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode", Matchers.is("RESIDENT-APP-026")))
                 .andExpect(jsonPath("$.errorMessage", Matchers.is("Api not accessible failure")));
     }
@@ -114,7 +114,7 @@ public class CredentialsControllerTest {
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(requestContent))
-                .andExpect(status().isServiceUnavailable())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode", Matchers.is("RESIDENT-APP-026")))
                 .andExpect(jsonPath("$.errorMessage", Matchers.is("Api not accessible failure")));
     }
