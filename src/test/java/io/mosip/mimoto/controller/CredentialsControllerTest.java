@@ -100,8 +100,8 @@ public class CredentialsControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .content(requestContent))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorCode", Matchers.is("RESIDENT-APP-026")))
-                .andExpect(jsonPath("$.errorMessage", Matchers.is("Api not accessible failure")));
+                .andExpect(jsonPath("$.errors[0].errorCode", Matchers.is("RESIDENT-APP-026")))
+                .andExpect(jsonPath("$.errors[0].errorMessage", Matchers.is("Api not accessible failure")));
     }
 
 
@@ -115,8 +115,8 @@ public class CredentialsControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .content(requestContent))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorCode", Matchers.is("RESIDENT-APP-026")))
-                .andExpect(jsonPath("$.errorMessage", Matchers.is("Api not accessible failure")));
+                .andExpect(jsonPath("$.errors[0].errorCode", Matchers.is("RESIDENT-APP-026")))
+                .andExpect(jsonPath("$.errors[0].errorMessage", Matchers.is("Api not accessible failure")));
     }
 
     @Test
@@ -131,8 +131,8 @@ public class CredentialsControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .content(requestContent))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorCode", Matchers.is("request_timed_out")))
-                .andExpect(jsonPath("$.errorMessage", Matchers.is("We are unable to process your request right now")));
+                .andExpect(jsonPath("$.errors[0].errorCode", Matchers.is("request_timed_out")))
+                .andExpect(jsonPath("$.errors[0].errorMessage", Matchers.is("We are unable to process your request right now")));
     }
 
     @Test
@@ -145,7 +145,7 @@ public class CredentialsControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .content(requestContent))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorCode", Matchers.is("Verification Failed!")))
-                .andExpect(jsonPath("$.errorMessage", Matchers.is("Error occurred when verifying the downloaded credential")));
+                .andExpect(jsonPath("$.errors[0].errorCode", Matchers.is("Verification Failed!")))
+                .andExpect(jsonPath("$.errors[0].errorMessage", Matchers.is("Error occurred when verifying the downloaded credential")));
     }
 }

@@ -9,9 +9,11 @@ import io.mosip.mimoto.exception.AuthorizationServerWellknownResponseException;
 import io.mosip.mimoto.exception.ExternalServiceUnavailableException;
 import io.mosip.mimoto.exception.InvalidCredentialResourceException;
 import io.mosip.mimoto.exception.InvalidWellknownResponseException;
+import io.mosip.mimoto.exception.PlatformErrorMessages;
 import io.mosip.mimoto.exception.VCVerificationException;
 import io.mosip.mimoto.service.CredentialService;
 import io.mosip.mimoto.service.IdpService;
+import io.mosip.mimoto.util.Utilities;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,11 +23,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayInputStream;
@@ -73,5 +78,38 @@ public class CredentialsController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "Content-Disposition")
                 .body(new InputStreamResource(inputStream));
+    }
+
+    @ExceptionHandler({ApiNotAccessibleException.class, InvalidCredentialResourceException.class,
+            VCVerificationException.class, AuthorizationServerWellknownResponseException.class,
+            InvalidWellknownResponseException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseWrapper<Object> handleBadRequestException(Exception ex) {
+        log.error("Credential download failed: ", ex);
+        String[] errorInfo = Utilities.handleExceptionWithErrorCode(ex, PlatformErrorMessages.MIMOTO_PDF_SIGN_EXCEPTION.getCode());
+        ResponseWrapper<Object> wrapper = new ResponseWrapper<>();
+        wrapper.setErrors(Utilities.getErrors(errorInfo[0], errorInfo[1]));
+        return wrapper;
+    }
+
+    @ExceptionHandler(ExternalServiceUnavailableException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ResponseWrapper<Object> handleExternalServiceUnavailableException(ExternalServiceUnavailableException ex) {
+        log.error("External service unavailable during credential download: ", ex);
+        String[] errorInfo = Utilities.handleExceptionWithErrorCode(ex, PlatformErrorMessages.MIMOTO_PDF_SIGN_EXCEPTION.getCode());
+        ResponseWrapper<Object> wrapper = new ResponseWrapper<>();
+        wrapper.setErrors(Utilities.getErrors(errorInfo[0], errorInfo[1]));
+        return wrapper;
+    }
+
+    @ExceptionHandler({WriterException.class, IOException.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseWrapper<Object> handleServerErrorException(Exception ex) {
+        log.error("Credential download server error: ", ex);
+        ResponseWrapper<Object> wrapper = new ResponseWrapper<>();
+        wrapper.setErrors(Utilities.getErrors(
+                PlatformErrorMessages.MIMOTO_PDF_SIGN_EXCEPTION.getCode(),
+                PlatformErrorMessages.MIMOTO_PDF_SIGN_EXCEPTION.getMessage()));
+        return wrapper;
     }
 }
