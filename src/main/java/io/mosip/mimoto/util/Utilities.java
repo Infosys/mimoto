@@ -3,6 +3,7 @@ package io.mosip.mimoto.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import io.mosip.mimoto.core.http.ResponseWrapper;
 import io.mosip.mimoto.dto.ErrorDTO;
 import io.mosip.mimoto.exception.ErrorConstants;
 import io.mosip.mimoto.exception.ExceptionUtils;
@@ -205,6 +206,27 @@ public class Utilities {
         }
         String specificCredentialPDFTemplate = getJson("", templateFileName);
         return !StringUtils.isEmpty(specificCredentialPDFTemplate)? specificCredentialPDFTemplate : getJson("", credentialTemplatePath);
+    }
+
+    public static ResponseEntity<Object> handleErrorResponse(
+            Exception exception, String flowErrorCode, HttpStatus status, MediaType contentType) {
+        String errorMessage = exception.getMessage();
+        String errorCode = flowErrorCode;
+
+        if (errorMessage.contains(DELIMITER)) {
+            String[] errorSections = errorMessage.split(DELIMITER);
+            errorCode = errorSections[0];
+            errorMessage = errorSections[1];
+        }
+
+        ResponseWrapper<Object> responseWrapper = new ResponseWrapper<>();
+        responseWrapper.setResponse(null);
+        responseWrapper.setErrors(Utilities.getErrors(errorCode, errorMessage));
+        ResponseEntity.BodyBuilder responseEntity = ResponseEntity.status(status);
+        if (contentType != null) {
+            responseEntity.contentType(contentType);
+        }
+        return responseEntity.body(responseWrapper);
     }
 
     public static String[] handleExceptionWithErrorCode(Exception exception, String flowErrorCode) {

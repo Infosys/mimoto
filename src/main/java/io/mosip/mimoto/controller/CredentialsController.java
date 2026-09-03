@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayInputStream;
@@ -83,33 +82,20 @@ public class CredentialsController {
     @ExceptionHandler({ApiNotAccessibleException.class, InvalidCredentialResourceException.class,
             VCVerificationException.class, AuthorizationServerWellknownResponseException.class,
             InvalidWellknownResponseException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseWrapper<Object> handleBadRequestException(Exception ex) {
+    public ResponseEntity<Object> handleBadRequestException(Exception ex) {
         log.error("Credential download failed: ", ex);
-        String[] errorInfo = Utilities.handleExceptionWithErrorCode(ex, PlatformErrorMessages.MIMOTO_PDF_SIGN_EXCEPTION.getCode());
-        ResponseWrapper<Object> wrapper = new ResponseWrapper<>();
-        wrapper.setErrors(Utilities.getErrors(errorInfo[0], errorInfo[1]));
-        return wrapper;
+        return Utilities.handleErrorResponse(ex, PlatformErrorMessages.MIMOTO_PDF_SIGN_EXCEPTION.getCode(), HttpStatus.BAD_REQUEST, MediaType.APPLICATION_JSON);
     }
 
     @ExceptionHandler(ExternalServiceUnavailableException.class)
-    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    public ResponseWrapper<Object> handleExternalServiceUnavailableException(ExternalServiceUnavailableException ex) {
+    public ResponseEntity<Object> handleExternalServiceUnavailableException(ExternalServiceUnavailableException ex) {
         log.error("External service unavailable during credential download: ", ex);
-        String[] errorInfo = Utilities.handleExceptionWithErrorCode(ex, PlatformErrorMessages.MIMOTO_PDF_SIGN_EXCEPTION.getCode());
-        ResponseWrapper<Object> wrapper = new ResponseWrapper<>();
-        wrapper.setErrors(Utilities.getErrors(errorInfo[0], errorInfo[1]));
-        return wrapper;
+        return Utilities.handleErrorResponse(ex, PlatformErrorMessages.MIMOTO_PDF_SIGN_EXCEPTION.getCode(), HttpStatus.SERVICE_UNAVAILABLE, MediaType.APPLICATION_JSON);
     }
 
     @ExceptionHandler({WriterException.class, IOException.class})
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseWrapper<Object> handleServerErrorException(Exception ex) {
+    public ResponseEntity<Object> handleServerErrorException(Exception ex) {
         log.error("Credential download server error: ", ex);
-        ResponseWrapper<Object> wrapper = new ResponseWrapper<>();
-        wrapper.setErrors(Utilities.getErrors(
-                PlatformErrorMessages.MIMOTO_PDF_SIGN_EXCEPTION.getCode(),
-                PlatformErrorMessages.MIMOTO_PDF_SIGN_EXCEPTION.getMessage()));
-        return wrapper;
+        return Utilities.handleErrorResponse(ex, PlatformErrorMessages.MIMOTO_PDF_SIGN_EXCEPTION.getCode(), HttpStatus.INTERNAL_SERVER_ERROR, MediaType.APPLICATION_JSON);
     }
 }
