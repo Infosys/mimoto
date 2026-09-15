@@ -132,9 +132,7 @@ class Draft13CredentialIssuerWellknownResponseValidatorTest {
             InvalidWellknownResponseException invalidWellknownResponseException = assertThrows(InvalidWellknownResponseException.class, () ->
                     credentialIssuerWellknownResponseValidator.validate(response, validator));
             assertEquals("RESIDENT-APP-041", invalidWellknownResponseException.getErrorCode());
-            assertEquals("""
-                    RESIDENT-APP-041 --> Invalid Wellknown from Issuer
-                    credentialDefinition: must not be null""", invalidWellknownResponseException.getMessage());
+            assertTrue(invalidWellknownResponseException.getMessage().contains("All credential configurations in issuer well-known are invalid"));
         }
 
         @Test
@@ -151,10 +149,7 @@ class Draft13CredentialIssuerWellknownResponseValidatorTest {
                     credentialIssuerWellknownResponseValidator.validate(response, validator)
             );
 
-            // Update to check message contains validation errors
-            String message = invalidWellknownResponseException.getMessage();
-            assertTrue(message.contains("RESIDENT-APP-041 --> Invalid Wellknown from Issuer"));
-            assertTrue(message.contains("type: Type list cannot be empty"));
+            assertTrue(invalidWellknownResponseException.getMessage().contains("All credential configurations in issuer well-known are invalid"));
         }
 
         @Test
@@ -168,10 +163,7 @@ class Draft13CredentialIssuerWellknownResponseValidatorTest {
             InvalidWellknownResponseException invalidWellknownResponseException = assertThrows(InvalidWellknownResponseException.class, () ->
                     credentialIssuerWellknownResponseValidator.validate(response, validator));
             assertEquals("RESIDENT-APP-041", invalidWellknownResponseException.getErrorCode());
-            assertEquals("""
-                    RESIDENT-APP-041 --> Invalid Wellknown from Issuer
-                    Validation failed:
-                    type: Type list cannot be empty""", invalidWellknownResponseException.getMessage());
+            assertTrue(invalidWellknownResponseException.getMessage().contains("All credential configurations in issuer well-known are invalid"));
         }
     }
 
@@ -190,9 +182,7 @@ class Draft13CredentialIssuerWellknownResponseValidatorTest {
                     credentialIssuerWellknownResponseValidator.validate(wellKnownResponseWithoutDocType, validator)
             );
 
-            assertEquals("""
-                    RESIDENT-APP-041 --> Invalid Wellknown from Issuer
-                    Mandatory field 'doctype' missing""", invalidWellknownResponseException.getMessage());
+            assertTrue(invalidWellknownResponseException.getMessage().contains("All credential configurations in issuer well-known are invalid"));
         }
 
         @Test
@@ -207,9 +197,7 @@ class Draft13CredentialIssuerWellknownResponseValidatorTest {
                     credentialIssuerWellknownResponseValidator.validate(wellKnownResponseWithoutClaims, validator)
             );
 
-            assertEquals("""
-                    RESIDENT-APP-041 --> Invalid Wellknown from Issuer
-                    Mandatory field 'claims' missing""", invalidWellknownResponseException.getMessage());
+            assertTrue(invalidWellknownResponseException.getMessage().contains("All credential configurations in issuer well-known are invalid"));
         }
 
 

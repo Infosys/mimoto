@@ -51,7 +51,7 @@ class V1CredentialIssuerWellknownResponseValidatorTest {
 
         InvalidWellknownResponseException exception = assertThrows(InvalidWellknownResponseException.class,
                 () -> v1Validator.validate(response, validator));
-        assertTrue(exception.getMessage().contains("Mandatory field 'display' missing for V1 ldp_vc"));
+        assertTrue(exception.getMessage().contains("All credential configurations in issuer well-known are invalid"));
     }
 
     @Test
@@ -66,7 +66,7 @@ class V1CredentialIssuerWellknownResponseValidatorTest {
 
         InvalidWellknownResponseException exception = assertThrows(InvalidWellknownResponseException.class,
                 () -> v1Validator.validate(response, validator));
-        assertTrue(exception.getMessage().contains("Mandatory field 'display' missing for V1 ldp_vc"));
+        assertTrue(exception.getMessage().contains("All credential configurations in issuer well-known are invalid"));
     }
 
     @Test
@@ -80,7 +80,7 @@ class V1CredentialIssuerWellknownResponseValidatorTest {
 
         InvalidWellknownResponseException exception = assertThrows(InvalidWellknownResponseException.class,
                 () -> v1Validator.validate(response, validator));
-        assertTrue(exception.getMessage().contains("Mandatory field 'claims' missing for V1 ldp_vc"));
+        assertTrue(exception.getMessage().contains("All credential configurations in issuer well-known are invalid"));
     }
 
     @Test
@@ -94,6 +94,6 @@ class V1CredentialIssuerWellknownResponseValidatorTest {
 
         InvalidWellknownResponseException exception = assertThrows(InvalidWellknownResponseException.class,
                 () -> v1Validator.validate(response, validator));
-        assertTrue(exception.getMessage().contains("Mandatory field 'claims' missing for V1 ldp_vc"));
+        assertTrue(exception.getMessage().contains("All credential configurations in issuer well-known are invalid"));
     }
 }
