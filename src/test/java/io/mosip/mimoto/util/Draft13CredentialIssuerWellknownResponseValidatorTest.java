@@ -205,18 +205,16 @@ class Draft13CredentialIssuerWellknownResponseValidatorTest {
         }
 
         @Test
-        void shouldThrowInvalidWellKnownResponseExceptionWhenMandatoryFieldClaimIsNotPresent() {
+        void shouldNotThrowWhenMsoMdocClaimsIsEmptySinceClaimsIsOptional() {
             CredentialsSupportedResponse credentialSupportedResponse = getCredentialSupportedResponse("CredentialType1", "mso_mdoc");
             credentialSupportedResponse.setClaims(Map.of());
             CredentialIssuerWellKnownResponse wellKnownResponseWithoutClaims = getCredentialIssuerWellKnownResponseDto("Issuer1",
                     Map.of("CredentialType1", credentialSupportedResponse));
 
             Draft13CredentialIssuerWellknownResponseValidator credentialIssuerWellknownResponseValidator = new Draft13CredentialIssuerWellknownResponseValidator();
-            InvalidWellknownResponseException invalidWellknownResponseException = assertThrows(InvalidWellknownResponseException.class, () ->
-                    credentialIssuerWellknownResponseValidator.validate(wellKnownResponseWithoutClaims, validator)
-            );
 
-            assertTrue(invalidWellknownResponseException.getMessage().contains("All credential configurations in issuer well-known are invalid"));
+            assertDoesNotThrow(() ->
+                    credentialIssuerWellknownResponseValidator.validate(wellKnownResponseWithoutClaims, validator));
         }
 
 

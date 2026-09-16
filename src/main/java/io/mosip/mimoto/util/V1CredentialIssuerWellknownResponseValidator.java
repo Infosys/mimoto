@@ -42,9 +42,6 @@ public class V1CredentialIssuerWellknownResponseValidator {
                     if (StringUtils.isBlank(config.getDoctype())) {
                         throw new InvalidWellknownResponseException("Mandatory field 'doctype' missing");
                     }
-                    if (CollectionUtils.isEmpty(config.getClaims())) {
-                        throw new InvalidWellknownResponseException("Mandatory field 'claims' missing");
-                    }
                 }
                 if (LDP_VC.equals(config.getFormat())) {
                     if (CollectionUtils.isEmpty(config.getDisplay())) {

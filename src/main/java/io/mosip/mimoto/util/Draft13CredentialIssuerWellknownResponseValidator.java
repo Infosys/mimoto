@@ -44,9 +44,6 @@ public class Draft13CredentialIssuerWellknownResponseValidator {
                     if (StringUtils.isBlank(config.getDoctype())) {
                         throw new InvalidWellknownResponseException("Mandatory field 'doctype' missing");
                     }
-                    if (CollectionUtils.isEmpty(config.getClaims())) {
-                        throw new InvalidWellknownResponseException("Mandatory field 'claims' missing");
-                    }
                 }
                 if (LDP_VC.equals(config.getFormat())) {
                     if (config.getCredentialDefinition() == null) {
