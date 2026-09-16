@@ -35,6 +35,9 @@ public class V1CredentialIssuerWellknownResponseValidator {
             String key = entry.getKey();
             CredentialsSupportedResponse config = entry.getValue();
             try {
+                if (config == null) {
+                    throw new InvalidWellknownResponseException("Null credential configuration");
+                }
                 if (MSO_MDOC.equals(config.getFormat())) {
                     if (StringUtils.isBlank(config.getDoctype())) {
                         throw new InvalidWellknownResponseException("Mandatory field 'doctype' missing");

@@ -120,6 +120,25 @@ class Draft13CredentialIssuerWellknownResponseValidatorTest {
         assertDoesNotThrow(() -> validatorInstance.validate(response, validator));
     }
 
+    @Test
+    void shouldSkipInvalidConfigAndRetainValidConfigWhenMixedConfigurationsProvided() {
+        Draft13CredentialIssuerWellknownResponseValidator validatorInstance = new Draft13CredentialIssuerWellknownResponseValidator();
+
+        CredentialsSupportedResponse validConfig = getCredentialSupportedResponse("validConfig");
+
+        CredentialsSupportedResponse invalidConfig = getCredentialSupportedResponse("invalidConfig");
+        invalidConfig.setCredentialDefinition(null);
+
+        Map<String, CredentialsSupportedResponse> configs = new LinkedHashMap<>();
+        configs.put("validConfig", validConfig);
+        configs.put("invalidConfig", invalidConfig);
+
+        CredentialIssuerWellKnownResponse mixedResponse = getCredentialIssuerWellKnownResponseDto("Issuer1", configs);
+
+        assertDoesNotThrow(() -> validatorInstance.validate(mixedResponse, validator));
+        assertEquals(Set.of("validConfig"), mixedResponse.getCredentialConfigurationsSupported().keySet());
+    }
+
     @Nested
     class LdpVcFormatWellKnownResponseValidationTest {
         @Test
