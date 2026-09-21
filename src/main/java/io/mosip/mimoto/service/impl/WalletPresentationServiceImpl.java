@@ -14,6 +14,7 @@ import io.mosip.mimoto.constant.SigningAlgorithm;
 import io.mosip.mimoto.dto.*;
 import io.mosip.mimoto.dto.mimoto.VCCredentialResponse;
 import io.mosip.mimoto.dto.resident.VerifiablePresentationSessionData;
+import jakarta.servlet.http.HttpSession;
 import io.mosip.mimoto.exception.*;
 import io.mosip.mimoto.model.VerifiablePresentation;
 import io.mosip.mimoto.repository.VerifiablePresentationsRepository;
@@ -54,6 +55,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -79,6 +81,7 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
     private final VerifiablePresentationsRepository verifiablePresentationsRepository;
     private final CredentialFormatHandlerFactory credentialFormatHandlerFactory;
     private final WalletCredentialService walletCredentialService;
+    private final SessionManager sessionManager;
 
     public WalletPresentationServiceImpl(
             VerifierService verifierService,
@@ -88,7 +91,8 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
             CredentialMatchingService credentialMatchingService,
             VerifiablePresentationsRepository verifiablePresentationsRepository,
             CredentialFormatHandlerFactory credentialFormatHandlerFactory,
-            WalletCredentialService walletCredentialService) {
+            WalletCredentialService walletCredentialService,
+            SessionManager sessionManager) {
         this.verifierService = verifierService;
         this.openID4VPService = openID4VPService;
         this.objectMapper = objectMapper;
@@ -97,10 +101,11 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
         this.verifiablePresentationsRepository = verifiablePresentationsRepository;
         this.credentialFormatHandlerFactory = credentialFormatHandlerFactory;
         this.walletCredentialService = walletCredentialService;
+        this.sessionManager = sessionManager;
     }
 
     @Override
-    public VPAuthorizationResult handleVPAuthorizationRequest(String urlEncodedVPAuthorizationRequest, String walletId)
+    public VPResponseDTO handleVPAuthorizationRequest(String urlEncodedVPAuthorizationRequest, String walletId, HttpSession session)
             throws ApiNotAccessibleException, IOException, URISyntaxException {
 
         String presentationId = UUID.randomUUID().toString();
@@ -117,7 +122,19 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
                 createVPResponseVerifierDTO(preRegisteredVerifiers, authorizationRequest, walletId);
 
         VPResponseDTO responseDTO = new VPResponseDTO(presentationId, verifierDTO, dcql);
-        return new VPAuthorizationResult(responseDTO, authorizationRequest, openID4VP);
+
+        VerifiablePresentationSessionData sessionData = new VerifiablePresentationSessionData(
+                presentationId,
+                urlEncodedVPAuthorizationRequest,
+                Instant.now(),
+                verifierDTO.isPreregisteredWithWallet(),
+                null,
+                dcql,
+                authorizationRequest,
+                openID4VP);
+        sessionManager.storePresentationSessionData(session, sessionData, walletId);
+
+        return responseDTO;
     }
 
     @Override

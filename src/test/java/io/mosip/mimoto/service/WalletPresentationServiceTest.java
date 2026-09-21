@@ -20,7 +20,9 @@ import io.mosip.mimoto.exception.*;
 import io.mosip.mimoto.model.VerifiablePresentation;
 import io.mosip.mimoto.repository.VerifiablePresentationsRepository;
 import io.mosip.mimoto.service.impl.OpenID4VPService;
+import io.mosip.mimoto.service.impl.SessionManager;
 import io.mosip.mimoto.service.impl.WalletPresentationServiceImpl;
+import jakarta.servlet.http.HttpSession;
 import io.mosip.mimoto.util.SigningKeyUtil;
 import io.mosip.mimoto.util.UrlParameterUtils;
 import io.mosip.openID4VP.OpenID4VP;
@@ -91,6 +93,12 @@ public class WalletPresentationServiceTest {
 
     @Mock
     private WalletCredentialService walletCredentialService;
+
+    @Mock
+    private SessionManager sessionManager;
+
+    @Mock
+    private HttpSession mockHttpSession;
 
     @Mock
     private AuthorizationDcqlRequest mockDcqlAuthorizationRequest;
@@ -209,7 +217,7 @@ public class WalletPresentationServiceTest {
         when(mockOpenID4VP.authenticateVerifier(anyString())).thenReturn(peRequest);
 
         VPResponseDTO result = walletPresentationService.handleVPAuthorizationRequest(
-                urlEncodedVPAuthorizationRequest, walletId).getResponseDTO();
+                urlEncodedVPAuthorizationRequest, walletId, mockHttpSession);
 
         assertNotNull(result);
         assertNotNull(result.getPresentationId());
@@ -237,7 +245,7 @@ public class WalletPresentationServiceTest {
         when(mockOpenID4VP.authenticateVerifier(anyString())).thenReturn(peRequest);
 
         VPResponseDTO result = walletPresentationService.handleVPAuthorizationRequest(
-                urlEncodedVPAuthorizationRequest, walletId).getResponseDTO();
+                urlEncodedVPAuthorizationRequest, walletId, mockHttpSession);
 
         assertNotNull(result);
         assertEquals("test-client", result.getVerifiablePresentationVerifierDTO().getName());
@@ -252,7 +260,7 @@ public class WalletPresentationServiceTest {
         when(verifierService.isVerifierTrustedByWallet(anyString(), anyString())).thenReturn(false);
 
         VPResponseDTO result = walletPresentationService.handleVPAuthorizationRequest(
-                urlEncodedVPAuthorizationRequest, walletId).getResponseDTO();
+                urlEncodedVPAuthorizationRequest, walletId, mockHttpSession);
 
         assertNotNull(result);
         assertEquals("test-client", result.getVerifiablePresentationVerifierDTO().getName());
@@ -278,7 +286,7 @@ public class WalletPresentationServiceTest {
         when(mockOpenID4VP.authenticateVerifier(anyString())).thenReturn(dcqlRequest);
 
         VPResponseDTO result = walletPresentationService.handleVPAuthorizationRequest(
-                urlEncodedVPAuthorizationRequest, walletId).getResponseDTO();
+                urlEncodedVPAuthorizationRequest, walletId, mockHttpSession);
 
         assertNotNull(result);
         assertTrue(result.isDcql());
@@ -305,7 +313,7 @@ public class WalletPresentationServiceTest {
         when(mockOpenID4VP.authenticateVerifier(anyString())).thenReturn(dcqlRequest);
 
         VPResponseDTO result = walletPresentationService.handleVPAuthorizationRequest(
-                urlEncodedVPAuthorizationRequest, walletId).getResponseDTO();
+                urlEncodedVPAuthorizationRequest, walletId, mockHttpSession);
 
         assertNotNull(result);
         assertTrue(result.isDcql());
@@ -329,7 +337,7 @@ public class WalletPresentationServiceTest {
         when(mockOpenID4VP.authenticateVerifier(anyString())).thenReturn(dcqlRequest);
 
         VPResponseDTO result = walletPresentationService.handleVPAuthorizationRequest(
-                urlEncodedVPAuthorizationRequest, walletId).getResponseDTO();
+                urlEncodedVPAuthorizationRequest, walletId, mockHttpSession);
 
         assertNotNull(result);
         assertTrue(result.isDcql());
@@ -352,7 +360,7 @@ public class WalletPresentationServiceTest {
         when(mockOpenID4VP.authenticateVerifier(anyString())).thenReturn(dcqlRequest);
 
         VPResponseDTO result = walletPresentationService.handleVPAuthorizationRequest(
-                urlEncodedVPAuthorizationRequest, walletId).getResponseDTO();
+                urlEncodedVPAuthorizationRequest, walletId, mockHttpSession);
 
         assertNotNull(result);
         assertFalse(result.isDcql());

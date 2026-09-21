@@ -7,7 +7,6 @@ import io.mosip.mimoto.dto.MatchingCredentialsResponseDTO;
 import io.mosip.mimoto.dto.MatchingCredentialsDTO;
 import io.mosip.mimoto.dto.SubmitPresentationRequestDTO;
 import io.mosip.mimoto.dto.VPAuthorizationRequestDTO;
-import io.mosip.mimoto.dto.VPAuthorizationResult;
 import io.mosip.mimoto.dto.VPResponseDTO;
 import io.mosip.mimoto.dto.resident.VerifiablePresentationSessionData;
 import io.mosip.mimoto.exception.ApiNotAccessibleException;
@@ -36,7 +35,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.time.Instant;
 
 import static io.mosip.mimoto.exception.ErrorConstants.*;
 
@@ -94,22 +92,10 @@ public class WalletPresentationsController {
         try {
             WalletUtil.validateWalletId(httpSession, walletId);
 
-            VPAuthorizationResult result = walletPresentationService.handleVPAuthorizationRequest(vpAuthorizationRequest.getAuthorizationRequestUrl(), walletId);
-            VPResponseDTO verifiablePresentationResponseDTO = result.getResponseDTO();
+            VPResponseDTO responseDTO = walletPresentationService.handleVPAuthorizationRequest(
+                    vpAuthorizationRequest.getAuthorizationRequestUrl(), walletId, httpSession);
 
-            VerifiablePresentationSessionData verifiablePresentationSessionData = new VerifiablePresentationSessionData(
-                    verifiablePresentationResponseDTO.getPresentationId(),
-                    vpAuthorizationRequest.getAuthorizationRequestUrl(),
-                    Instant.now(),
-                    verifiablePresentationResponseDTO.getVerifiablePresentationVerifierDTO().isPreregisteredWithWallet(),
-                    null,
-                    verifiablePresentationResponseDTO.isDcql(),
-                    result.getParsedAuthorizationRequest(),
-                    result.getOpenID4VP());
-
-            sessionManager.storePresentationSessionData(httpSession, verifiablePresentationSessionData, walletId);
-
-            return ResponseEntity.status(HttpStatus.OK).body(verifiablePresentationResponseDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
         } catch (OpenID4VPExceptions exception) {
             log.error("Error occurred while processing the received VP Authorization Request from Verifier: ", exception);
             return Utilities.getErrorResponseEntityWithoutWrapper(
