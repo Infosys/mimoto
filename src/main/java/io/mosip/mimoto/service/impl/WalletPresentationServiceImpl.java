@@ -127,7 +127,7 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
                 presentationId,
                 urlEncodedVPAuthorizationRequest,
                 Instant.now(),
-                verifierDTO.isPreregisteredWithWallet(),
+                shouldValidateClient,
                 null,
                 dcql,
                 authorizationRequest,
