@@ -23,7 +23,7 @@ public class VerifiablePresentationSessionData implements Serializable {
     /** True when the authorization request had a DCQL query; selects DCQL vs PE flow. */
     private boolean dcql;
     /** Parsed result of the initial authenticateVerifier call — used by credential matching. */
-    private AuthorizationRequest parsedAuthorizationRequest;
+    private transient AuthorizationRequest parsedAuthorizationRequest;
     /** OpenID4VP instance from the initial authenticateVerifier call — reused in submitPresentation
      *  to avoid regenerating walletNonce (which causes wallet_nonce mismatch in request_uri_method=post). */
     private transient OpenID4VP openID4VPInstance;

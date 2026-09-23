@@ -150,7 +150,6 @@ public class WalletPresentationServiceTest {
         sessionData.setAuthorizationRequest(urlEncodedVPAuthorizationRequest);
         sessionData.setCreatedAt(Instant.now());
         sessionData.setVerifierClientPreregistered(true);
-        sessionData.setParsedAuthorizationRequest(mockDcqlAuthorizationRequest);
 
         vcCredentialResponse = new VCCredentialResponse();
         vcCredentialResponse.setFormat(CredentialFormat.LDP_VC.getFormat());
@@ -673,7 +672,7 @@ public class WalletPresentationServiceTest {
         when(dcqlQuery.getCredentialSets()).thenReturn(null);
 
         stubOpenId4VpCreate(mockOpenID4VP);
-        when(mockDcqlAuthorizationRequest.getDcqlQuery()).thenReturn(dcqlQuery);
+        when(openID4VPService.resolveDcqlQuery(any(), any(), anyBoolean())).thenReturn(dcqlQuery);
         when(keyPairService.getKeyPairFromDB(anyString(), anyString(), any(SigningAlgorithm.class))).thenReturn(keyPair);
 
         List<UnsignedVPToken> unsignedTokens = List.of(mockLdpUnsignedToken());
@@ -729,7 +728,7 @@ public class WalletPresentationServiceTest {
         when(dcqlQuery.getCredentialSets()).thenReturn(null);
 
         stubOpenId4VpCreate(mockOpenID4VP);
-        when(mockDcqlAuthorizationRequest.getDcqlQuery()).thenReturn(dcqlQuery);
+        when(openID4VPService.resolveDcqlQuery(any(), any(), anyBoolean())).thenReturn(dcqlQuery);
         when(keyPairService.getKeyPairFromDB(anyString(), anyString(), any(SigningAlgorithm.class))).thenReturn(keyPair);
 
         List<UnsignedVPToken> unsignedTokens = List.of(mockLdpUnsignedToken());
@@ -805,7 +804,7 @@ public class WalletPresentationServiceTest {
         when(dcqlQuery.getCredentialSets()).thenReturn(null);
 
         stubOpenId4VpCreate(mockOpenID4VP);
-        when(mockDcqlAuthorizationRequest.getDcqlQuery()).thenReturn(dcqlQuery);
+        when(openID4VPService.resolveDcqlQuery(any(), any(), anyBoolean())).thenReturn(dcqlQuery);
         when(keyPairService.getKeyPairFromDB(anyString(), anyString(), any(SigningAlgorithm.class))).thenReturn(keyPair);
 
         List<UnsignedVPToken> unsignedTokens = List.of(mockLdpUnsignedToken(), mockLdpUnsignedToken());
@@ -892,7 +891,7 @@ public class WalletPresentationServiceTest {
         doReturn(allProps).when(credentialFormatHandler).extractAllCredentialProperties(any());
 
         stubOpenId4VpCreate(mockOpenID4VP);
-        when(mockDcqlAuthorizationRequest.getDcqlQuery()).thenReturn(dcqlQuery);
+        when(openID4VPService.resolveDcqlQuery(any(), any(), anyBoolean())).thenReturn(dcqlQuery);
         when(keyPairService.getKeyPairFromDB(anyString(), anyString(), any(SigningAlgorithm.class))).thenReturn(keyPair);
 
         List<UnsignedVPToken> unsignedTokens = List.of(mockSdJwtUnsignedToken());
@@ -991,7 +990,7 @@ public class WalletPresentationServiceTest {
         doReturn(allProps).when(credentialFormatHandler).extractAllCredentialProperties(any());
 
         stubOpenId4VpCreate(mockOpenID4VP);
-        when(mockDcqlAuthorizationRequest.getDcqlQuery()).thenReturn(dcqlQuery);
+        when(openID4VPService.resolveDcqlQuery(any(), any(), anyBoolean())).thenReturn(dcqlQuery);
         when(keyPairService.getKeyPairFromDB(anyString(), anyString(), any(SigningAlgorithm.class))).thenReturn(keyPair);
 
         List<UnsignedVPToken> unsignedTokens = List.of(mockSdJwtUnsignedToken());
@@ -1046,7 +1045,7 @@ public class WalletPresentationServiceTest {
 
         stubOpenId4VpCreate(mockOpenID4VP);
         when(mockOpenID4VP.authenticateVerifier(anyString())).thenReturn(mockAuthorizationRequest);
-        when(mockDcqlAuthorizationRequest.getDcqlQuery()).thenReturn(dcqlQuery);
+        when(openID4VPService.resolveDcqlQuery(any(), any(), anyBoolean())).thenReturn(dcqlQuery);
 
         try {
             walletPresentationService.submitPresentation(
@@ -1092,7 +1091,7 @@ public class WalletPresentationServiceTest {
 
         stubOpenId4VpCreate(mockOpenID4VP);
         when(mockOpenID4VP.authenticateVerifier(anyString())).thenReturn(mockAuthorizationRequest);
-        when(mockDcqlAuthorizationRequest.getDcqlQuery()).thenReturn(dcqlQuery);
+        when(openID4VPService.resolveDcqlQuery(any(), any(), anyBoolean())).thenReturn(dcqlQuery);
 
         try {
             walletPresentationService.submitPresentation(
@@ -1130,7 +1129,7 @@ public class WalletPresentationServiceTest {
 
         stubOpenId4VpCreate(mockOpenID4VP);
         when(mockOpenID4VP.authenticateVerifier(anyString())).thenReturn(mockAuthorizationRequest);
-        when(mockDcqlAuthorizationRequest.getDcqlQuery()).thenReturn(dcqlQuery);
+        when(openID4VPService.resolveDcqlQuery(any(), any(), anyBoolean())).thenReturn(dcqlQuery);
 
         try {
             walletPresentationService.submitPresentation(
@@ -1183,7 +1182,7 @@ public class WalletPresentationServiceTest {
 
         stubOpenId4VpCreate(mockOpenID4VP);
         when(mockOpenID4VP.authenticateVerifier(anyString())).thenReturn(mockAuthorizationRequest);
-        when(mockDcqlAuthorizationRequest.getDcqlQuery()).thenReturn(dcqlQuery);
+        when(openID4VPService.resolveDcqlQuery(any(), any(), anyBoolean())).thenReturn(dcqlQuery);
         when(keyPairService.getKeyPairFromDB(anyString(), anyString(), any(SigningAlgorithm.class))).thenReturn(keyPair);
 
         List<UnsignedVPToken> unsignedTokens = List.of(mockLdpUnsignedToken());

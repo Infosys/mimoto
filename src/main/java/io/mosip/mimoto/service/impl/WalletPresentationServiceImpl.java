@@ -420,7 +420,10 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
     private void validateDcqlSelections(SubmitPresentationRequestDTO request, VerifiablePresentationSessionData sessionData)
             throws ApiNotAccessibleException, IOException {
 
-        DCQLQuery dcqlQuery = AuthorizationRequestHelper.extractDcqlQuery(sessionData.getParsedAuthorizationRequest());
+        DCQLQuery dcqlQuery = openID4VPService.resolveDcqlQuery(
+                sessionData.getPresentationId(),
+                sessionData.getAuthorizationRequest(),
+                sessionData.isVerifierClientPreregistered());
         if (dcqlQuery == null) {
             return;
         }
@@ -500,7 +503,10 @@ public class WalletPresentationServiceImpl implements WalletPresentationService 
             return merged.isEmpty() ? null : merged;
         }
 
-        DCQLQuery dcqlQuery = AuthorizationRequestHelper.extractDcqlQuery(sessionData.getParsedAuthorizationRequest());
+        DCQLQuery dcqlQuery = openID4VPService.resolveDcqlQuery(
+                sessionData.getPresentationId(),
+                sessionData.getAuthorizationRequest(),
+                sessionData.isVerifierClientPreregistered());
         if (dcqlQuery == null) {
             return merged.isEmpty() ? null : merged;
         }

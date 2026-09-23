@@ -2529,7 +2529,7 @@ public class CredentialMatchingServiceTest {
     @Test
     public void testGetMatchingCredentialsDcqlWhenResolveReturnsNull() throws Exception {
         VerifiablePresentationSessionData dcqlSession = createDcqlSessionData();
-        when(mockDcqlAuthorizationRequest.getDcqlQuery()).thenReturn(null);
+        when(openID4VPService.resolveDcqlQuery(any(), any(), anyBoolean())).thenReturn(null);
         when(walletCredentialService.getDecryptedCredentials(eq(walletId), any()))
                 .thenReturn(createMockWalletCredentialsWithMapData());
 
@@ -2777,12 +2777,11 @@ public class CredentialMatchingServiceTest {
         data.setCreatedAt(Instant.parse("2025-09-08T12:34:56Z"));
         data.setVerifierClientPreregistered(true);
         data.setDcql(true);
-        data.setParsedAuthorizationRequest(mockDcqlAuthorizationRequest);
         return data;
     }
 
     private void stubDcqlQuery(DCQLQuery dcqlQuery) throws Exception {
-        when(mockDcqlAuthorizationRequest.getDcqlQuery()).thenReturn(dcqlQuery);
+        when(openID4VPService.resolveDcqlQuery(any(), any(), anyBoolean())).thenReturn(dcqlQuery);
     }
 
     private void stubCredentialQueryBasics(CredentialQuery credentialQuery) {
